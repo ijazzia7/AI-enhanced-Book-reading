@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Book Reader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="tts-container">
+        <button id="generate-audio">Generate Audio</button>
+        <audio id="audio-player" controls style="display:none;"></audio>
+    </div>
+    <div class="container">
+
+        <main id="content-area">
+            <div id="book-content">
+                <!-- Book content will be dynamically injected here -->
+            </div>
+            <div class="navigation">
+                <button id="prev-button" disabled>Previous</button>
+                <button id="next-button">Next</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Popup element that will appear next to selected text -->
+    <div id="popup" style="display: none;">
+        This is a popup!
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+
