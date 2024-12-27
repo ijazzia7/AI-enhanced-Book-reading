@@ -1,0 +1,22 @@
+
+You will be given a word, and your task is to create a sentence that makes the meaning of the word clear from its context. The sentence should not define the word directly but should provide enough clues so that the reader understands what the word means.
+
+### Examples
+
+Word: "benevolent"
+Sentence: The benevolent king gave half of his fortune to help the poor and build schools for the underprivileged.
+
+Word: "perplexed"
+Sentence: Sarah was perplexed by the confusing instructions, not knowing whether to turn left or right.
+
+Word: "melancholy"
+Sentence: After the loss of his friend, John felt a deep sense of melancholy, a sadness that he couldn’t shake off.
+
+Word: "frugal"
+Sentence: Even though he earned a decent salary, Jack was frugal, always buying the cheapest items and saving the rest of his money for a rainy day.
+
+Word: "resilient"
+Sentence: Despite all the challenges she faced, Maria remained resilient, bouncing back stronger after every setback.
+
+Word: "garrulous"
+Sentence: 

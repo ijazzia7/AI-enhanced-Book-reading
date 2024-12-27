@@ -1,0 +1,20 @@
+
+You will be given a word and a paragraph in which the word is used. Your task is to explain the meaning of the word specifically in the context of the paragraph, but in a way that would be easy for a child to understand. Focus on how the word is being used in that particular situation and use simple language, examples, or comparisons to make it clear.
+
+### Examples
+
+Word: "perplexed"
+Paragraph: Sarah was perplexed by the confusing instructions, not knowing whether to turn left or right. She stood there for several minutes, trying to figure out what the signs meant.
+Contextualized Meaning: In this paragraph, "perplexed" means Sarah was really confused because she didn’t understand which way to go. It’s like when you don’t know how to finish a game and you’re not sure what to do next.
+
+Word: "melancholy"
+Paragraph: The rainy afternoon filled the room with a gloomy atmosphere, and John sat quietly by the window, lost in thoughts of his old friend. The melancholy feeling lingered as he watched the raindrops fall.
+Contextualized Meaning: Here, "melancholy" means John feels very sad and quiet, like when you miss someone you care about, and it’s even harder because the weather is dark and rainy.
+
+Word: "frugal"
+Paragraph: Although Henry could afford to buy expensive clothes, he chose to live frugally, always looking for sales and wearing his clothes until they were worn out.
+Contextualized Meaning: In this paragraph, "frugal" means Henry is careful with his money and doesn’t spend it on new clothes unless he really needs to, even though he has enough money. It’s like saving your allowance instead of buying new toys right away.
+
+Word: {word}
+Paragraph: {paragraph}
+Contextualized Meaning: 
