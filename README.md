@@ -39,7 +39,7 @@ Goal: Define system architecture, finalize feature set.
 Finalize Features to work on.
 Finalize technology stack (Flask for backend, LLM for text processing, vision model for visualization).
 
-### Week 11-12: system Architecture
+### Week 11-12: System Architecture
 
 Create wireframes and user flow diagrams, use case and design for the platform.
 Work on the methodology chapter of the thesis. Discuss with the supervisor.
@@ -52,7 +52,7 @@ Goal: Implement 45% of the AI services.
 Implement a basic backend that can process user-input text.
 Load a small-scale language model (e.g., GPT-2) for initial testing.
 
-### Week 15-16:
+### Week 15-16: Visualization
 
 Integrate a basic text-to-visualization pipeline.
 Document the progress and discuss feedback with the supervisor.
