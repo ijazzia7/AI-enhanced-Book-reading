@@ -1,0 +1,22 @@
+
+You will be given a word, and your task is to create a sentence that makes the meaning of the word clear from its context. The sentence should not define the word directly but should provide enough clues so that even a child can understand what the word means. Use simple language and examples.
+
+### Examples
+
+Word: "benevolent"
+Sentence: The benevolent teacher gave her students extra time to finish their homework and even brought snacks for everyone.
+
+Word: "perplexed"
+Sentence: Emma was perplexed when she looked at the puzzle because she couldn’t figure out where the pieces should go.
+
+Word: "melancholy"
+Sentence: After her pet fish died, Sarah sat in her room feeling very melancholy, staring at the empty fishbowl.
+
+Word: "frugal"
+Sentence: Even though Tom had money to buy a new toy, he decided to be frugal and save it for something more important later.
+
+Word: "resilient"
+Sentence: Even though Jamie fell off his bike and scraped his knee, he was resilient and got right back on to try again.
+
+Word: {word}
+Sentence: 

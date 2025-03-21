@@ -1,0 +1,406 @@
+/* importing font */
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* header */
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: 2rem;
+  padding-block: 1rem;
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+  position: sticky;
+  top: 0;
+}
+
+header h1 {
+  font-size: 28px;
+}
+
+header nav ul {
+  display: flex;
+  gap: 10px;
+  list-style: none;
+}
+
+nav ul li a {
+  color: black;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s;
+  padding: 7px 12px;
+  border-radius: 18px;
+  transition: background-color 0.5s ease;
+}
+
+nav ul li a:hover {
+  background-color: lightblue;
+}
+
+/* main */
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  padding-inline: 30px;
+  height: 83vh;
+  margin-bottom: 16px;
+}
+
+/* left side (book) - start */
+
+#reading-container {
+  width: 50%;
+  height: 99%;
+  font-size: 16px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 2px 2px 15px rgba(128, 128, 128, 0.5);
+}
+
+#book-content {
+  overflow: auto;
+  height: 87%;
+  background-color: #fff8e1;
+  padding: 25px 15px 5px;
+  line-height: 1.5;
+}
+
+/* For Chrome, Edge, and Safari */
+#book-content::-webkit-scrollbar {
+  width: 8px; /* Set the scrollbar width */
+}
+
+#book-content::-webkit-scrollbar-thumb {
+  background-color: #888; /* Scrollbar color */
+  border-radius: 4px; /* Rounded corners */
+}
+
+#book-content::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Darker on hover */
+}
+
+#book-content::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Track background */
+}
+
+/* For Firefox */
+#book-content {
+  scrollbar-width: thin; /* Reduces scrollbar width */
+  scrollbar-color: #888 #f1f1f1; /* Thumb and track colors */
+}
+
+.book-navigation {
+  background-color: #fff8e1;
+  height: 13%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  font-size: 20px;
+  box-shadow: 3px 3px 15px rgba(128, 128, 128, 0.5);
+}
+
+.book-navigation button {
+  all: unset;
+  font-size: 18px;
+  background-color: #5d4037;
+  color: white;
+  width: 110px;
+  font-weight: 400;
+  text-align: center;
+  padding-block: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.book-navigation #page_num_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 42px;
+  font-size: 22px;
+  font-weight: 600;
+  background-color: #5d4037;
+  color: white;
+  border-radius: 20px;
+}
+
+audio {
+  margin-top: 10px;
+}
+
+/* left side (book) - end */
+
+/* right side (book) - start */
+
+#side-panel {
+  width: 50%;
+  height: 99%;
+  background-color: #e5e5e5;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* Tab Header */
+.side-tabs {
+  display: flex;
+  justify-content: space-between;
+  background-color: #845f53;
+}
+
+.side-tabs button {
+  all: unset;
+  color: white;
+  padding: 12px 0;
+  font-size: 20px;
+  font-weight: 500;
+  width: calc(100% / 3);
+  text-align: center;
+}
+
+.side-tabs button.active {
+  background-color: #5d4037;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+
+#chat-box {
+  flex: 1; /* Takes up remaining space above the input container */
+  padding: 15px;
+  background: var(--paper-bg);
+  overflow-y: auto;
+}
+
+#chat-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+#chat-box::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 4px;
+}
+
+#chat-box::-webkit-scrollbar-track {
+  background: #eee;
+}
+
+.chat-message {
+  margin: 10px 0;
+  display: block;
+  width: -moz-fit-content;      /* Firefox */
+  width: -webkit-fit-content;   /* Chrome/Safari */
+  width: fit-content;
+  max-width: 80%;              
+  padding: 10px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  line-height: 1.4;
+  clear: both;
+  animation: fadeInBubble 0.4s ease-in;
+  background: #f0f0f0;          /* Example background */
+}
+
+@keyframes fadeInBubble {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-message.you {
+  background: #845f53;
+  color: #ffffff;
+  margin-left: auto;
+  border-bottom-right-radius: 0;
+}
+
+.chat-message.bot {
+  background: #fff8e1;
+  color: #333;
+  margin-right: auto;
+  border-bottom-left-radius: 0;
+}
+
+
+
+/* Input Container for Chat - Transparent Background */
+#input-container {
+  display: flex; /* Side-by-side layout for input and button */
+  align-items: center; /* Vertically center the input and button */
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background: transparent; /* Remove white background */
+}
+
+/* Input Field */
+#input-container input {
+  flex: 1; /* Occupies remaining horizontal space */
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 20px;
+  font-size: 14px;
+  outline: none;
+  background: transparent;
+  
+}
+
+/* Send Button */
+#input-container button {
+  border: none;
+  background-color: #5d4037;
+  padding: 8px 16px;
+  border-radius: 23px;
+  cursor: pointer;
+  height: 30px;
+  width: 70px;
+  transition: background 0.3s;
+  display: flex; /* Allows icon centering */
+  align-items: center; /* Vertically center icon */
+  justify-content: center; /* Horizontally center icon */
+}
+
+
+#input-container button i{
+font-size: 12px;
+color: #ffffff;
+font-family:  "Poppins", serif;
+}
+/* Hover state */
+#input-container button:hover {
+  background: #a96e5d;
+}
+
+/* ============================
+       Insights Section
+=============================== */
+#insights-container {
+  flex: 1;
+  padding: 15px;
+  background: var(--paper-bg);
+  overflow-y: auto;
+}
+
+#insights-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+#insights-container::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 4px;
+}
+
+#insights-container::-webkit-scrollbar-track {
+  background: #eee;
+}
+
+/* ============================
+   Highlighted Word Styling
+=============================== */
+.highlighted-word {
+  color: #ff69b4; /* Pink font color */
+  cursor: pointer;
+  position: relative;
+}
+
+.highlighted-word::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;
+  bottom: -1.8em;
+  background: #fff;
+  color: #333;
+  padding: 5px 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  white-space: nowrap;
+  display: none;
+  z-index: 10;
+}
+
+.highlighted-word:hover::after,
+.highlighted-word.show-tooltip::after {
+  display: block;
+}
+
+/* right side (book) - start */
+
+/* footer start */
+footer {
+  background-color: #f5f5f5;
+  font-size: 18px;
+  width: 100%;
+  text-align: center;
+  padding: 15px 0;
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* footer end */
+
+/* Popup Styling */
+
+#popup {
+  position: absolute;
+  z-index: 2000;
+
+  display: flex;
+  gap: 4px;
+  flex-direction: row;
+  background-color: #e0ddd1;
+  border-radius: 25px;
+  padding: 10px;
+  box-shadow: 3px 5px 20px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.popup_buttons {
+  border: none;
+  outline: none;
+  font-family: inherit;
+  background-color: transparent;
+  color: black;
+  /* border: 0.1px solid gray; */
+  font-size: 15px;
+  font-weight: 400;
+  border-radius: 25px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.popup_buttons:hover {
+  background-color: #5d4037;
+  color: white;
+  /* transform: translateY(-2px); */
+}
+
+.popup_buttons:active {
+  transform: translateY(0);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
