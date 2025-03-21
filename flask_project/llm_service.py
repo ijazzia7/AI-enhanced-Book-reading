@@ -28,6 +28,7 @@ class Visualization:
         pass
         
     def get_images(self):
+        #dummy images
         img1 = Image.open('/Users/ijazulhaq/flask_book_reading/static/images/vis1.jpeg') 
         img2 = Image.open('/Users/ijazulhaq/flask_book_reading/static/images/vis2.jpeg') 
         img3 = Image.open('/Users/ijazulhaq/flask_book_reading/static/images/vis3.jpeg') 

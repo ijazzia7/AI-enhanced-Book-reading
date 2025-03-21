@@ -21,7 +21,7 @@ vis = Visualization()
 
 #tagger = SequenceTagger.load("flair/ner-english-fast")
 # PDF Book Path and Chunk Size
-BOOK_PATH = "static/books/The Kite Runner.pdf"
+BOOK_PATH = "flask_project/static/books/The Kite Runner.pdf"
 CHUNK_SIZE = 500  # Number of characters per chunk
 characters_dict={}
 
@@ -81,7 +81,6 @@ def characters_to_display(characters_dict):
 def simple_meaning():
     data = request.get_json()
     selected_text = data.get('selected_text', '')
-    print('get the word')
     if selected_text:
         prompt  = 'Word: "{word}"'
         prompt_template = ChatPromptTemplate.from_template(prompt)
@@ -89,7 +88,6 @@ def simple_meaning():
         final_prompt = messages[0].content
         output = model.generate_response(final_prompt, 0)
         #output = 'Lorem ipsum this'
-        print('Output generated')
         return jsonify({"LLM_output": output}), 200
     return jsonify({"error": "No text received."}), 400
 
