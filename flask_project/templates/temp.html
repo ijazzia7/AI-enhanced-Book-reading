@@ -1,0 +1,70 @@
+<div class="open-book" style="position: relative; height: 500px; background: #f0f0f0; padding: 1em;">
+    <p>Test content for the book.</p>
+    <canvas id="annotation-canvas" style="position: absolute; top: 0; left: 0; z-index: 10;"></canvas>
+  </div>
+  <button id="annotate-button">Annotate</button>
+  <select id="pen-color">
+    <option value="red">Red</option>
+    <option value="blue">Blue</option>
+  </select>
+  <input id="pen-width" type="range" min="1" max="20" value="10">
+
+
+  
+  <script>
+    const canvas = document.getElementById("annotation-canvas");
+    const ctx = canvas.getContext("2d");
+    const annotateButton = document.getElementById("annotate-button");
+    const colorPicker = document.getElementById("pen-color");
+    const widthSlider = document.getElementById("pen-width");
+    const openBook = document.querySelector(".open-book");
+    
+    let isDrawing = false;
+    let drawEnabled = false;
+    
+    function resizeCanvas() {
+      const rect = openBook.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      canvas.style.width = rect.width + "px";
+      canvas.style.height = rect.height + "px";
+      canvas.style.left = "0px"; // within the open-book
+      canvas.style.top = "0px";
+    }
+    
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+    
+    annotateButton.addEventListener("click", () => {
+      drawEnabled = !drawEnabled;
+      canvas.style.pointerEvents = drawEnabled ? "auto" : "none";
+      console.log("Annotate mode:", drawEnabled);
+    });
+    
+    canvas.addEventListener("mousedown", (e) => {
+      if (!drawEnabled) return;
+      isDrawing = true;
+      const x = e.offsetX;
+      const y = e.offsetY;
+      ctx.lineWidth = parseInt(widthSlider.value) || 10;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = colorPicker.value;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    });
+    
+    canvas.addEventListener("mousemove", (e) => {
+      if (isDrawing) {
+        const x = e.offsetX;
+        const y = e.offsetY;
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+    });
+    
+    canvas.addEventListener("mouseup", () => {
+      isDrawing = false;
+      ctx.closePath();
+    });
+  </script>
+  

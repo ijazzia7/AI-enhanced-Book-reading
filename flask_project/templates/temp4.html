@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Turn.js Flipbook Demo</title>
+  <style>
+    body {
+      background: #1e1e1e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: sans-serif;
+    }
+
+    #flipbook {
+      width: 600px;
+      height: 400px;
+    }
+
+    .page {
+      background: oldlace;
+      border: 1px solid #ccc;
+      padding: 2em;
+      font-size: 1.1rem;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="flipbook">
+    <div class="page">Page 1: Hello, this is a flipbook!</div>
+    <div class="page">Page 2: Try dragging the corners.</div>
+    <div class="page">Page 3: Works like a real book.</div>
+    <div class="page">Page 4: The end!</div>
+  </div>
+
+  <!-- jQuery (required) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Turn.js -->
+  <script src="https://cdn.jsdelivr.net/gh/blasten/turn.js@4/turn.min.js"></script>
+
+  <script>
+    $(document).ready(function () {
+      $('#flipbook').turn({
+        width: 600,
+        height: 400,
+        autoCenter: true
+      });
+    });
+  </script>
+
+</body>
+</html>

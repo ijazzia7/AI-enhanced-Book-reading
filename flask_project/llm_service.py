@@ -89,7 +89,8 @@ class ChatWithBook:
         # for x in range(len(splits)):
         #     splits[x].page_content = splits[x].page_content.replace('\t\r \xa0', ' ')
         
-        persist_dir = 'static/prompts/docs/chromaNewest/'
+        persist_dir = 'static/chroma'
+
         # self.vector_db = Chroma.from_documents(
         # documents = splits,
         # embedding = hf_embeddings,
@@ -103,6 +104,8 @@ class ChatWithBook:
         print(question, page)
         docs_returned = self.vector_db.similarity_search(question, k=5, filter={'page':{'$lt': page}})
         paragraph = '\n'.join([x.page_content for x in docs_returned])
+        
+        print(docs_returned)
 
         f = '''Answer the question based on the information provided in the paragraph. Do not include information that is not explicitly stated in the paragraph. If the answer cannot be found in the paragraph, respond with "The answer is not available in the paragraph."'''
 
@@ -180,9 +183,9 @@ class ChatWithBook:
         print(question)
         print(page)
         completion = self.client.chat.completions.create(
-        model="Qwen/Qwen2.5-1.5B-Instruct", 
+        model="mistralai/Mistral-7B-Instruct-v0.2", 
         messages = [
-        {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+        {"role": "system", "content": "You are Mistral. You are a helpful assistant."},
         {"role": "user", "content": f},
         {"role": "assistant", "content": "Sure! Please provide the first question."},
     
@@ -207,7 +210,7 @@ class ChatWithBook:
         {"role": "user", "content": prompt},
                     ])
         
-        return completion.choices[0].message.content
+        return completion.choices[0].message.content.split('Answer:')[-1]
 
 
 
@@ -217,7 +220,7 @@ class LLMService:
         self.client = InferenceClient(api_key=api_key)
         prompt = ''
         self.all_messages = [[
-            {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+            {"role": "system", "content": "You are Mistral. You are a helpful assistant.."},
             {"role": "user", "content": "You will be given a word, and your task is to explain its meaning in a simple, clear, and easy-to-understand way. Avoid overly technical language, and use relatable examples when needed."},
             {"role": "assistant", "content": "Sure! Please provide the first word."},
             
@@ -239,7 +242,7 @@ class LLMService:
             {"role": "user", "content": prompt},
         ], 
                              [
-        {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+        {"role": "system", "content": "You are Mistral. You are a helpful assistant."},
         {"role": "user", "content": "You will be given a word and a paragraph in which the word is used. Your task is to explain the meaning of the word specifically in the context of the paragraph. Focus on how the word is being used and what it means in that particular situation, not its general or dictionary definition."},
         {"role": "assistant", "content": "Sure! Please provide the first paragraph and word."},
         
@@ -262,7 +265,7 @@ class LLMService:
         ],
                              
         [
-        {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+        {"role": "system", "content": "You are Mistral. You are a helpful assistant."},
         {"role": "user", "content": "You will be given a word, and your task is to create a sentence that makes the meaning of the word clear from its context. The sentence should not define the word directly but should provide enough clues so that the reader understands what the word means."},
         {"role": "assistant", "content": "Sure! Please provide the first word."},
         
@@ -291,7 +294,7 @@ class LLMService:
         messages = self.all_messages[ind]
         messages[-1]['content'] = prompt
         completion = self.client.chat.completions.create(
-            model="Qwen/Qwen2.5-1.5B-Instruct", 
+            model="mistralai/Mistral-7B-Instruct-v0.2", 
             messages=messages, 
             max_tokens=500, temperature=0.1)
         

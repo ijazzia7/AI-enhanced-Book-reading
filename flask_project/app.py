@@ -8,20 +8,25 @@ import numpy as np
 
 
 app = Flask(__name__)
-model = LLMService()
-tts_service = Text2SpeechService()
-#model=1
-#tts_service=2
+#model = LLMService()
+#tts_service = Text2SpeechService()
+model=1
+tts_service=2
 
 chat_bot = ChatWithBook()
 
 summary = Summarization()
 audio = audio_to_text()
 vis = Visualization()
+summary = 1
+audio = 1
+vis = 1
+
+
 
 #tagger = SequenceTagger.load("flair/ner-english-fast")
 # PDF Book Path and Chunk Size
-BOOK_PATH = "flask_project/static/books/The Kite Runner.pdf"
+BOOK_PATH = "static/books/my_book-9.pdf"
 CHUNK_SIZE = 500  # Number of characters per chunk
 characters_dict={}
 
@@ -32,7 +37,8 @@ def load_pdf_pages():
     with pdfplumber.open(BOOK_PATH) as pdf:
         for page in pdf.pages:
             text = page.extract_text_simple()
-            text = text.replace('\t\r \xa0', ' ').replace('\n \n', '<br><br>').replace('\n', '').replace('_', '').replace('-­‐', '-')
+            text = text.replace(' \n ', '<br><br>').replace('\n \n', '<br><br>').replace('_', '').replace('-­‐', '-')
+
             pages.append(text if text else "Page is empty")  # Handle empty pages
             
     return pages
@@ -42,7 +48,7 @@ book_pages = load_pdf_pages()
 
 @app.route('/') 
 def index():
-    return render_template('index.html')
+    return render_template('homepage.html')
 
 @app.route('/get_page/<int:page_num>', methods=['GET'])
 def get_page(page_num):
@@ -57,9 +63,12 @@ def get_page(page_num):
         #characters_dict[page_num] = list(set(l))
         #characters = characters_to_display(characters_dict).tolist()
         
-        return jsonify({'page': book_pages[page_num], 'next_page': page_num + 1, 'prev_page': page_num - 1})#, 'characters':characters})
+        return jsonify({'page1': book_pages[page_num],'page2': book_pages[page_num+1], 'next_page': page_num + 2, 'prev_page': page_num - 2})#, 'characters':characters})
     return jsonify({'page': '', 'next_page': None, 'prev_page': None})  # End of book
 
+@app.route('/book-link') 
+def reading_page():
+    return render_template('reading.html')
 
 def characters_to_display(characters_dict):
     l = list(characters_dict.values())
@@ -86,8 +95,8 @@ def simple_meaning():
         prompt_template = ChatPromptTemplate.from_template(prompt)
         messages = prompt_template.format_messages(word=selected_text)
         final_prompt = messages[0].content
-        output = model.generate_response(final_prompt, 0)
-        #output = 'Lorem ipsum this'
+        #output = model.generate_response(final_prompt, 0)
+        output = 'Lorem ipsum this'
         return jsonify({"LLM_output": output}), 200
     return jsonify({"error": "No text received."}), 400
 
@@ -102,8 +111,8 @@ def contextual_meaning():
         prompt_template = ChatPromptTemplate.from_template(prompt)
         messages = prompt_template.format_messages(word=selected_text, paragraph=paragraph)
         final_prompt = messages[0].content
-        output = model.generate_response(final_prompt, 1)
-        #output = 'Lorem ipsum this is a testing meaning of the word. This should be replaced by the model output'
+        #output = model.generate_response(final_prompt, 1)
+        output = 'Lorem ipsum this is a testing meaning of the word. This should be replaced by the model output'
         #print(output)
         return jsonify({"LLM_output": output}), 200
     return jsonify({"error": "No text received."}), 400
@@ -119,8 +128,8 @@ def create_sentence():
         prompt_template = ChatPromptTemplate.from_template(prompt)
         messages = prompt_template.format_messages(word=selected_text)
         final_prompt = messages[0].content
-        output = model.generate_response(final_prompt, 2)
-        #output = 'Lorem ipsum this is a testing meaning of the word. This should be replaced by the model output'
+        #output = model.generate_response(final_prompt, 2)
+        output = 'Lorem ipsum this is a testing meaning of the word. This should be replaced by the model output'
         return jsonify({"LLM_output": output}), 200
     return jsonify({"error": "No text received."}), 400
 
@@ -151,8 +160,8 @@ def chatting():
     question = data.get('question')
     page_num = data.get('page_number')
     if question:
-        output = chat_bot.chat(question, page_num)
-        #output = 'Hello how can we help you? This is a dummy response. A dummy response'
+        #output = chat_bot.chat(question, page_num)
+        output = 'Hello how can we help you? This is a dummy response. A dummy response'
         return jsonify({"chat_reply": output}), 200
     return jsonify({"error": "No text received."}), 400
 

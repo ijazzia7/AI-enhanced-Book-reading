@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+  
   // --- Cache DOM Elements ---
   const bookContentEl = document.getElementById("book-content");
   const nextButton = document.getElementById("next-button");
@@ -23,11 +24,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const chatContainer = document.getElementById("chat-container");
   const insightsContainer = document.getElementById("insights-container");
   const visContainer = document.getElementById("visual-container");
-
+  const popup = document.getElementById("popup");
 
   // Create and append popup element
-  const popup = createPopup();
-  document.body.appendChild(popup);
+  // const popup = createPopup();
+  // document.body.appendChild(popup);
 
   // --- Global Variables ---
   let currentPage = 0;
@@ -84,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Allow a slight delay for selection to register
     setTimeout(() => {
       selectedText = window.getSelection().toString().trim();
-      console.log("Selected Text:", selectedText);
       if (selectedText) {
         const selection = window.getSelection();
         if (selection.rangeCount > 0) {
@@ -98,21 +98,25 @@ document.addEventListener("DOMContentLoaded", () => {
           );
           selectedParagraph = index !== -1 ? paragraphs[index] : "";
           // Position and show the popup
-          popup.style.display = "flex";
-          popup.style.left = `${rect.left + window.scrollX}px`;
-          popup.style.top = `${rect.bottom + window.scrollY}px`;
+          // popup.style.display = "flex";
+          // popup.style.left = `${rect.left + window.scrollX}px`;
+          // popup.style.top = `${rect.bottom + window.scrollY}px`;
         }
-      } else {
-        popup.style.display = "none";
-      }
+      } 
+      // else {
+      //   popup.style.display = "none";
+      // }
+      console.log("Selected Text:", selectedText);
+
     }, 10);
   });
 
-  document.addEventListener("mousedown", (event) => {
-    if (!popup.contains(event.target)) {
-      popup.style.display = "none";
-    }
-  });
+
+  // document.addEventListener("mousedown", (event) => {
+  //   if (!popup.contains(event.target)) {
+  //     popup.style.display = "none";
+  //   }
+  // });
 
   // --- Popup Button Actions ---
   document.getElementById("simple-meaning").addEventListener("click", () => {
@@ -122,8 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "Simple Meaning"
     );
   });
-  document
-    .getElementById("contextual-meaning")
+  document.getElementById("contextual-meaning")
     .addEventListener("click", () => {
       handlePopupAction(
         "/contextual_meaning",
@@ -159,6 +162,7 @@ document.getElementById("vis-para").addEventListener("click", () => {
   chatSendButton.addEventListener("click", () => {
     const question = messageInput.value.trim();
     if (!question) return;
+    appendChatMessage("You", question, chatBox);
     fetch("/chat_book", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -166,7 +170,7 @@ document.getElementById("vis-para").addEventListener("click", () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        appendChatMessage("You", question, chatBox);
+        
         appendChatMessage("Bot", data.chat_reply, chatBox);
         messageInput.value = "";
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -176,19 +180,19 @@ document.getElementById("vis-para").addEventListener("click", () => {
 
   // --- Function Definitions ---
 
-  function createPopup() {
-    const popupEl = document.createElement("div");
-    popupEl.id = "popup";
-    popupEl.innerHTML = `
-          <button class="popup_buttons" id="simple-meaning">Meaning</button>
-          <button class="popup_buttons" id="contextual-meaning">Context Meaning</button>
-          <button class="popup_buttons" id="create-sentence">Sentence</button>
-          <button class="popup_buttons" id="generate-audio">Speak</button>
-          <button class="popup_buttons" id="vis-para">Visualize Para</button>
+  // function createPopup() {
+  //   const popupEl = document.createElement("div");
+  //   popupEl.id = "popup";
+  //   popupEl.innerHTML = `
+  //         <button class="popup_buttons" id="simple-meaning">Meaning</button>
+  //         <button class="popup_buttons" id="contextual-meaning">Context Meaning</button>
+  //         <button class="popup_buttons" id="create-sentence">Sentence</button>
+  //         <button class="popup_buttons" id="generate-audio">Speak</button>
+  //         <button class="popup_buttons" id="vis-para">Visualize Para</button>
 
-      `;
-    return popupEl;
-  }
+  //     `;
+  //   return popupEl;
+  // }
 
   // Loads a page from the backend and re-applies existing highlights.
   function loadPage(pageNum) {
@@ -239,7 +243,9 @@ document.getElementById("vis-para").addEventListener("click", () => {
 
   // Handles popup actions for LLM functions, stores mapping, and highlights globally.
   function handlePopupAction(url, payload, resultTitle) {
-    if (!selectedText) return;
+    st = selectedText
+    console.log(selectedParagraph)
+    if (!st) return;
     fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -250,10 +256,11 @@ document.getElementById("vis-para").addEventListener("click", () => {
         //document.getElementById("popup-text").textContent = data.LLM_output;
         appendInsight(resultTitle, data.LLM_output);
         // Save mapping (case-insensitive)
-        highlightedWords[selectedText.toLowerCase()] = data.LLM_output;
+        highlightedWords[st.toLowerCase()] = data.LLM_output;
         // Recursively highlight all occurrences on the current page
-        highlightAllOccurrences(selectedText, data.LLM_output);
-        popup.style.display = "none";
+        console.log(st)
+        highlightAllOccurrences(st, data.LLM_output);
+        // popup.style.display = "none";
       })
       .catch((error) => console.error("Popup Action Error:", error));
   }

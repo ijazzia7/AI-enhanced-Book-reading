@@ -1,0 +1,142 @@
+<button id="addBtn">Add New</button>
+<div class="sticky-container">
+<!--   sticky notes are created here -->
+</div>
+
+<script>
+  const addBtn = document.querySelector("#addBtn");
+
+addBtn.addEventListener("click", ()=>{
+    let stickyCont = document.querySelector(".sticky-container");
+    let stickySingle = document.createElement('div');
+    stickySingle.classList.add('sticky');
+    stickySingle.contentEditable = "true";
+    stickySingle.setAttribute = ("role","textbox");
+    stickySingle.innerHTML = "Write me"
+    stickyCont.appendChild(stickySingle);
+  
+    // Delete button
+    let close = document.createElement('span');
+    close.classList.add('close');
+    close.innerHTML = "X";
+    close.contentEditable = "false";
+    stickySingle.appendChild(close);
+  
+    // Delete function. used "for" to bind delete button with 
+    // coresponding stickynote
+    let stickies = document.getElementsByClassName("sticky");
+    let xs = document.getElementsByClassName("close");
+
+    for (let i = 0; i < stickies.length; i++){
+        xs[i].addEventListener("click", ()=> {
+            console.log(stickies.length);
+            stickies[i].style.display = "none";
+        });
+    }
+    
+    // Random angle
+    function randomNumber(min, max) { 
+      return Math.random() * (max - min) + min; 
+    }
+    let angle = randomNumber(-3,3);
+    stickySingle.style.transform = "rotate(" + angle+"deg)";
+  
+    let color = randomNumber(1,720);
+    stickySingle.style.filter = "hue-rotate(" + color +"deg)";
+});
+</script>
+
+<style>
+  
+@import url('https://fonts.googleapis.com/css?family=Indie+Flower&display=swap');
+body {
+    background:#ffb385;
+    height:100vh;
+    font-family: 'Indie Flower', cursive;
+    overflow: hidden;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+button {
+    background: transparent;
+    padding: 15px 30px;  
+    margin-left:10px;
+    margin-top:10px;
+    color: #d1f5d3;
+    font-family: 'Indie Flower', cursive;
+    font-size: 25px;
+    border: 3px solid #d1f5d3;
+    outline:none;
+    border-radius: 5px;
+    cursor: pointer;    
+  
+  &:active {
+      transform: scale(0.98);
+    }
+}
+
+
+.sticky-container {
+   height:100vh;
+   width:100%;
+   display:flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+  
+  .sticky{
+    position:relative;
+    height:280px;
+    width:220px;
+    display:inline-block;
+    margin:10px;
+    padding:18px 10px 10px 10px;
+    box-sizing: border-box;
+    box-shadow: 6px 7px 12px -5px rgba(0,0,0,0.75);
+    font-size:24px;
+    background: #ffd31d;
+    resize: both;
+    overflow: scroll;
+    animation: stickAnim .3s ease;
+    
+    &::-webkit-scrollbar {
+      display: none;  
+    }
+    
+    &:focus {
+      outline: none;
+    }
+    
+    .close {
+      font-size: 26px;
+      position: absolute;
+      top: 0;
+      right:0;
+      cursor: pointer;
+      width: 18px;
+      
+        &:active {
+          transform: scale(0.98);
+        }
+    }
+    
+    @keyframes stickAnim {
+      0%{
+        transform: scale(5);
+      }
+      
+      100% {
+        transform: scale(1);
+      }
+    }
+
+  }
+}
+
+
+
+
+</style>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KnowledgeBase</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #f5f5f5;
+      padding: 0;
+    }
+
+    .wrapper {
+      background-color: #fdd4cc;
+      padding: 2rem 0;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 25px;
+      padding: 2rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    /* Navigation */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: black;
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 20px;
+    }
+
+    .logo span {
+      font-weight: 600;
+      font-size: 20px;
+    }
+
+    .logo span:nth-child(1) {
+      color: #6c63ff;
+    }
+
+    .logo span:nth-child(2) {
+      color: #f78ca2;
+    }
+
+    .nav-links a {
+      color: white;
+      margin-left: 20px;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    /* Search */
+    .search-box {
+      margin: 2rem 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .search-box input {
+      width: 60%;
+      padding: 1rem;
+      border-radius: 15px;
+      border: none;
+      background: #f2f2f2;
+      font-size: 16px;
+    }
+
+    /* Filters */
+    .genres {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    .genre {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #333;
+      background-color: #ffe0e0;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .genre:nth-child(1) { background: #ffd4c2; }
+    .genre:nth-child(2) { background: #fff7b2; }
+    .genre:nth-child(3) { background: #c5f4c5; }
+    .genre:nth-child(4) { background: #d1f5d3; }
+    .genre:nth-child(5) { background: #bde9ff; }
+    .genre:nth-child(6) { background: #e0d1ff; }
+    .genre:nth-child(7) { background: #e7c8ff; }
+    .genre:nth-child(8) { background: #ffcce0; }
+    .genre:nth-child(9) { background: #eedcdc; }
+    .genre:nth-child(10) { background: #fdd4cc; }
+
+    /* Book Cards */
+    .book-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      justify-content: space-between;
+    }
+
+    .book-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 1rem;
+      width: 48%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .book-card h4 {
+      margin: 0.8rem 0 0.5rem;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .explore {
+      font-size: 14px;
+      color: #6c63ff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .book-thumbs {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .book-thumbs img {
+      width: 60px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <div class="container">
+
+      <!-- Nav -->
+      <div class="navbar">
+        <div class="logo">
+          <span>Know</span><span>ledgeBase</span>
+        </div>
+        <div class="nav-links">
+          <a href="#">Books</a>
+          <a href="#">Events</a>
+          <a href="#">Club</a>
+          <a href="#">More</a>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="search-box">
+        <input type="text" placeholder="Search Books" />
+      </div>
+
+      <!-- Genres -->
+      <div class="genres">
+        <button class="genre">Romance</button>
+        <button class="genre">Comedy</button>
+        <button class="genre">Mystery</button>
+        <button class="genre">Thriller</button>
+        <button class="genre">Mystery</button>
+        <button class="genre">SciFi</button>
+        <button class="genre">Kids</button>
+        <button class="genre">Adventure</button>
+        <button class="genre">Comics</button>
+        <button class="genre">Fantasy</button>
+        <button class="genre">Classics</button>
+        <button class="genre">Shorts</button>
+      </div>
+
+      <!-- Books -->
+      <div class="book-section">
+        <div class="book-card">
+          <div class="book-thumbs">
+            <img src="https://via.placeholder.com/60x90?text=AYDA" alt="">
+            <img src="https://via.placeholder.com/60x90?text=Solomon" alt="">
+          </div>
+          <h4>Children’s Books</h4>
+          <a class="explore" href="#">Explore</a>
+        </div>
+
+        <div class="book-card">
+          <div class="book-thumbs">
+            <img src="https://via.placeholder.com/60x90?text=That" alt="">
+            <img src="https://via.placeholder.com/60x90?text=Night" alt="">
+            <img src="https://via.placeholder.com/60x90?text=Clouds" alt="">
+          </div>
+          <h4>Fantasies / Fictions</h4>
+          <a class="explore" href="#">Explore</a>
+        </div>
+
+        <div class="book-card">
+          <div class="book-thumbs">
+            <img src="https://via.placeholder.com/60x90?text=Summer" alt="">
+            <img src="https://via.placeholder.com/60x90?text=Love" alt="">
+            <img src="https://via.placeholder.com/60x90?text=Duke" alt="">
+          </div>
+          <h4>Summer of Love</h4>
+          <a class="explore" href="#">Explore</a>
+        </div>
+
+        <div class="book-card">
+          <div class="book-thumbs">
+            <img src="https://via.placeholder.com/60x90?text=Educated" alt="">
+            <img src="https://via.placeholder.com/60x90?text=Great" alt="">
+            <img src="https://via.placeholder.com/60x90?text=Harris" alt="">
+          </div>
+          <h4>Classic Collections</h4>
+          <a class="explore" href="#">Explore</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

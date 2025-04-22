@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BookBase Improved</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    /* BASIC RESET */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: #eceef5;
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    /* MAIN APP LAYOUT */
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* LEFT SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(145deg, #ffffff, #f2f2f2);
+      padding: 2rem 1.5rem;
+      box-shadow: 3px 0 8px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .brand {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #2948ff;
+      margin-bottom: 1.5rem;
+    }
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: #555;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    .nav-links a:hover {
+      color: #2948ff;
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding-top: 1rem;
+      border-top: 1px solid #ddd;
+    }
+    .user-profile img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #2948ff;
+    }
+    .user-profile span {
+      font-size: 0.95rem;
+      color: #333;
+      font-weight: 600;
+    }
+
+    /* MAIN CONTENT */
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      background: linear-gradient(145deg, #f5f8fc, #e9eff9);
+    }
+    /* SEARCH BAR */
+    .search-bar {
+      position: relative;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 1rem 3rem 1rem 1.5rem;
+      border-radius: 50px;
+      border: 1px solid #ccc;
+      background: #fff;
+      font-size: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      outline: none;
+      transition: box-shadow 0.2s ease;
+    }
+    .search-bar input:focus {
+      box-shadow: 0 2px 10px rgba(41, 72, 255, 0.3);
+    }
+    .search-icon {
+      position: absolute;
+      right: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: #888;
+      pointer-events: none;
+    }
+
+    /* RECOMMENDED SECTION */
+    .recommended {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+    .recommended-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .recommended-header h2 {
+      font-size: 1.3rem;
+      color: #333;
+    }
+    .recommended-header a {
+      text-decoration: none;
+      color: #2948ff;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    .recommended-header a:hover {
+      color: #1f36d0;
+    }
+    .books-row {
+      display: flex;
+      gap: 1.2rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+    .books-row::-webkit-scrollbar {
+      height: 6px;
+    }
+    .books-row::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 3px;
+    }
+    .book-card {
+      min-width: 110px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+    .book-card:hover {
+      transform: translateY(-3px);
+    }
+    .book-card img {
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      object-fit: cover;
+    }
+    .book-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #444;
+    }
+
+    /* CATEGORIES */
+    .categories {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+    .categories-header h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    .categories-tabs {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+    }
+    .categories-tabs::-webkit-scrollbar {
+      height: 6px;
+    }
+    .categories-tabs::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 3px;
+    }
+    .category-item {
+      background: #f7f9fc;
+      border-radius: 30px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      color: #666;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s ease, color 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .category-item:hover {
+      background: #2948ff;
+      color: #fff;
+      border: 1px solid #2948ff;
+    }
+
+    /* RIGHT PANEL */
+    .right-panel {
+      width: 300px;
+      background: linear-gradient(145deg, #192b5d, #14204a);
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      color: #fff;
+      box-shadow: -3px 0 10px rgba(0, 0, 0, 0.2);
+    }
+    .featured-book {
+      background: #0c1c42;
+      border-radius: 15px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .featured-book img {
+      width: 110px;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    }
+    .featured-book h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+    .featured-book p {
+      font-size: 0.9rem;
+      color: #cccccc;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+    .rating span {
+      color: #ffc107;
+      font-size: 1rem;
+      margin-right: 3px;
+    }
+    .read-now-btn {
+      display: inline-block;
+      background: #2948ff;
+      color: #fff;
+      text-decoration: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+    .read-now-btn:hover {
+      background: #1f36d0;
+    }
+    
+    @media (max-width: 1024px) {
+      .app { flex-direction: column; }
+      .right-panel { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div>
+        <div class="brand">BookBase</div>
+        <div class="nav-links">
+          <a href="#">Discover</a>
+          <a href="#">Recommended</a>
+          <a href="#">Categories</a>
+          <a href="#">Saved</a>
+          <a href="#">Profile</a>
+        </div>
+      </div>
+      <div class="user-profile">
+        <img src="https://via.placeholder.com/50x50" alt="User Profile">
+        <span>Username</span>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <input type="text" placeholder="Search your favourite books" />
+        <span class="search-icon">&#128269;</span>
+      </div>
+
+      <!-- Recommended Section -->
+      <div class="recommended">
+        <div class="recommended-header">
+          <h2>Recommended</h2>
+          <a href="#">See All</a>
+        </div>
+        <div class="books-row">
+          <div class="book-card">
+            <img src="https://via.placeholder.com/110x160?text=Book1" alt="Book 1">
+            <div class="book-title">Psychology of Money</div>
+          </div>
+          <div class="book-card">
+            <img src="https://via.placeholder.com/110x160?text=Book2" alt="Book 2">
+            <div class="book-title">Innovation Insight</div>
+          </div>
+          <div class="book-card">
+            <img src="https://via.placeholder.com/110x160?text=Book3" alt="Book 3">
+            <div class="book-title">Company of One</div>
+          </div>
+          <div class="book-card">
+            <img src="https://via.placeholder.com/110x160?text=Book4" alt="Book 4">
+            <div class="book-title">Slapshot Tactic</div>
+          </div>
+          <div class="book-card">
+            <img src="https://via.placeholder.com/110x160?text=Book5" alt="Book 5">
+            <div class="book-title">Paul Jarvis</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories Section -->
+      <div class="categories">
+        <div class="categories-header">
+          <h3>Categories</h3>
+        </div>
+        <div class="categories-tabs">
+          <div class="category-item">Business</div>
+          <div class="category-item">Finance</div>
+          <div class="category-item">Education</div>
+          <div class="category-item">Philosophy</div>
+          <div class="category-item">Fiction</div>
+          <div class="category-item">Geography</div>
+          <div class="category-item">Self-help</div>
+          <div class="category-item">Romance</div>
+          <div class="category-item">Sci-Fi</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <div class="featured-book">
+        <img src="https://via.placeholder.com/110x160?text=Featured" alt="Featured Book">
+        <h4>Company of One</h4>
+        <p>Learn how to keep your business lean and agile for a competitive edge.</p>
+        <div class="rating">
+          <span>&#9733;</span>
+          <span>&#9733;</span>
+          <span>&#9733;</span>
+          <span>&#9733;</span>
+          <span style="color:#666;">&#9733;</span>
+        </div>
+        <a href="#" class="read-now-btn">Read Now</a>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

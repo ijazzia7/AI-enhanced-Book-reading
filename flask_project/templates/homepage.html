@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BookBase Improved</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='homepage.css') }}"
+    />
+</head>
+<body>
+    <header>
+
+    </header>
+
+  <div class="app">
+
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div>
+        <div class="brand">BookBase</div>
+        <div class="nav-links">
+          <a href="#">Discover</a>
+          <a href="#">Recommended</a>
+          <a href="#">Categories</a>
+          <a href="#">Saved</a>
+          <a href="#">Profile</a>
+        </div>
+      </div>
+      
+    </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+
+            <!-- Search Bar -->
+          <div class='search-background'>
+            <div class="search-bar">
+                <input type="text" placeholder="Search your favourite books" />
+                <span class="search-icon">&#128269;</span>
+            </div>
+
+            <div class="user-profile">
+              <img src="static/images/user.png" alt="User Profile">
+              <span>Username</span>
+            </div>
+
+          </div>
+            
+            <div class='grouped-together'>
+
+                    <div class='grouped-together-2'>
+                        <!-- Recommended Section -->
+                        <div class="recommended">
+                            <div class="recommended-header">
+                            <h2>Recommended</h2>
+                            <a href="#">See All</a>
+                            </div>
+                            <div class="books-row">
+                              
+                            <a href="/book-link" class='book-link'>
+                              <div class="book-card">
+                                <img class='book_images' src="static/images/thekiterunner.jpg" alt="Book 1">
+                                <div class="book-title">The Kite Runner</div>
+                                <div class='book-author'>Fyodor Dostoevsky</div>
+                            </div>
+                          </a>
+
+                          <a href="/book-link" class='book-link'>
+                            <div class="book-card">
+                                <img class='book_images' src="static/images/crimeandpunishment.jpg" alt="Book 2">
+                                <div class="book-title">Crime and Punishment</div>
+                                <div class='book-author'>Fyodor Dostoevsky</div>
+                            </div>
+                          </a>
+                          
+                            <a href="/book-link" class='book-link'>
+                            <div class="book-card">
+                                <img class='book_images' src="static/images/animalfarm.jpg" alt="Book 3">
+                                <div class="book-title">Animal Farm</div>
+                                <div class='book-author'>Fyodor Dostoevsky</div>
+                            </div>
+                          </a>
+
+                            <a href="/book-link" class='book-link'>
+                            <div class="book-card">
+                                <img class='book_images' src="static/images/mockingbird.png" alt="Book 4">
+                                <div class="book-title">To Kill A Mocking Bird</div>
+                                <div class='book-author'>Fyodor Dostoevsky</div>
+                            </div>
+                          </a>
+
+                            <a href="/book-link" class='book-link'>
+                            <div class="book-card">
+                                <img class='book_images' src="static/images/whitenights.png" alt="Book 5">
+                                <div class="book-title">White Nights</div>
+                                <div class='book-author'>Fyodor Dostoevsky</div>
+                            </div>
+                          </a>
+
+                        </div>
+                        </div>
+
+                        <!-- Categories Section -->
+                        <div class="categories">
+                            <div class="categories-header">
+                            <h3>Categories</h3>
+                            </div>
+                            <div class="categories-tabs">
+                            <div class="category-item">Business</div>
+                            <div class="category-item">Finance</div>
+                            <div class="category-item">Education</div>
+                            <div class="category-item">Philosophy</div>
+                            <div class="category-item">Fiction</div>
+                            <div class="category-item">Geography</div>
+                            <div class="category-item">Self-help</div>
+                            <div class="category-item">Romance</div>
+                            <div class="category-item">Sci-Fi</div>
+                            </div>
+                        </div>
+
+                    </div>
+           
+
+
+        
+                    <!-- Right Panel -->
+                    <div class="right-panel">
+                    <div class="featured-book">
+                        <img src="https://via.placeholder.com/110x160?text=Featured" alt="Featured Book">
+                        <h4>Company of One</h4>
+                        <p>Learn how to keep your business lean and agile for a competitive edge.</p>
+                        <div class="rating">
+                        <span>&#9733;</span>
+                        <span>&#9733;</span>
+                        <span>&#9733;</span>
+                        <span>&#9733;</span>
+                        <span style="color:#666;">&#9733;</span>
+                        </div>
+                        <a href="#" class="read-now-btn">Read Now</a>
+                    </div>
+
+            </div>
+        </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

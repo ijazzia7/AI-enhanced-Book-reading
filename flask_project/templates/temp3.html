@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color Picker Popup</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+
+    .toolbar {
+      position: relative;
+      display: inline-block;
+    }
+
+    .color-button {
+      padding: 10px 15px;
+      border-radius: 5px;
+      background-color: #eee;
+      border: none;
+      cursor: pointer;
+    }
+
+    .color-popup {
+      position: absolute;
+      top: 110%;
+      left: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 10px;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+    }
+
+    .color-option {
+      width: 25px;
+      height: 25px;
+      margin: 5px;
+      border-radius: 50%;
+      display: inline-block;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.2s;
+    }
+
+    .color-option:hover {
+      transform: scale(1.2);
+      border-color: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <button class="color-button">Highlight</button>
+    <div class="color-popup" id="colorPopup">
+      <div class="color-option" style="background-color: yellow;"></div>
+      <div class="color-option" style="background-color: pink;"></div>
+      <div class="color-option" style="background-color: lightblue;"></div>
+      <div class="color-option" style="background-color: lightgreen;"></div>
+    </div>
+  </div>
+
+  <script>
+    const button = document.querySelector(".color-button");
+    const popup = document.getElementById("colorPopup");
+
+    button.addEventListener("click", () => {
+      popup.style.display = popup.style.display === "block" ? "none" : "block";
+    });
+
+    // Optional: Close popup if clicked outside
+    window.addEventListener("click", (e) => {
+      if (!e.target.closest('.toolbar')) {
+        popup.style.display = "none";
+      }
+    });
+  </script>
+
+</body>
+</html>
