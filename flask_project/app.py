@@ -26,7 +26,7 @@ vis = 1
 
 #tagger = SequenceTagger.load("flair/ner-english-fast")
 # PDF Book Path and Chunk Size
-BOOK_PATH = "static/books/my_book-9.pdf"
+BOOK_PATH = "static/books/my_book-10.pdf"
 CHUNK_SIZE = 500  # Number of characters per chunk
 characters_dict={}
 
@@ -62,8 +62,22 @@ def get_page(page_num):
         #        l.append(entity.text)
         #characters_dict[page_num] = list(set(l))
         #characters = characters_to_display(characters_dict).tolist()
+        page_1 = book_pages[page_num]
+        page_2 = book_pages[page_num+1]
         
-        return jsonify({'page1': book_pages[page_num],'page2': book_pages[page_num+1], 'next_page': page_num + 2, 'prev_page': page_num - 2})#, 'characters':characters})
+        if '#$#$' in page_1:
+            new_chap = 'one'
+            chap_name = page_1.split('#$#$')[1]
+            page_1 = '<br><br>'.join(page_1.split('#$#$')[2].split('<br><br>')[1:])
+        elif '#$#$' in page_2:
+            new_chap = 'two'
+            chap_name = page_2.split('#$#$')[1]
+            page_2 = '<br><br>'.join(page_2.split('#$#$')[2].split('<br><br>')[1:])
+        else:
+            new_chap='none'
+            chap_name='none'
+        
+        return jsonify({'page1': page_1,'page2': page_2,'chap': new_chap,'chapterName':chap_name, 'next_page': page_num + 2, 'prev_page': page_num - 2})#, 'characters':characters})
     return jsonify({'page': '', 'next_page': None, 'prev_page': None})  # End of book
 
 @app.route('/book-link') 

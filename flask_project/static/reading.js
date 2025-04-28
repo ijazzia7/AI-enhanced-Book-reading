@@ -28,7 +28,12 @@ function loadPage(pageNum) {
         if (data.page1) {
           bookContentEl1.innerHTML = `<p>${data.page1}</p>`;
           bookContentEl2.innerHTML = `<p>${data.page2}</p>`;
-
+          console.log(data.page1)
+          on_page = data.chap
+          chapter_title = data.chapterName
+          if (on_page!='none'){
+          display_title(on_page, chapter_title)
+        }
           prevButton.disabled = data.prev_page < 0;
           nextButton.disabled = data.next_page === null;
           // Re-highlight all processed words on this page
@@ -55,6 +60,28 @@ function loadPage(pageNum) {
       })
       .catch((error) => console.error("Load Page Error:", error));
   }
+
+  // FUNCTION FOR CHAPTER TITLE DISPLAY
+  function display_title(on_page, chapter_title) {
+    const title = document.createElement("h2")
+    title.className = "chapter-title";
+    title.textContent = chapter_title;
+
+    if (on_page === "one") {
+      const wrapper = document.getElementById("book-content-1");
+      wrapper.prepend(title)
+    } 
+    else if (on_page === "two") {
+      const wrapper = document.getElementById("book-content-2"); 
+      wrapper.prepend(title)
+    }
+
+
+
+  }
+
+
+
 
   loadPage(currentPage);
   nextButton.addEventListener("click", () => {

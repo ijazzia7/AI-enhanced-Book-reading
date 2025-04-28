@@ -87,7 +87,7 @@ body {
     display: flex;
     flex-direction: row;
     justify-content:space-between;
-    height:85%;
+    height:90%;
 
 }
 
@@ -115,18 +115,19 @@ body {
 
 .search-background {
 background-color: #ffffff;
-height: 15%;
+height: 10%;
 display: flex;
 padding: 15px;
 justify-content: space-between;
 box-shadow: inset 8px 0 35px -15px rgba(0, 0, 0, 0.2);
+align-items: center;
 }
 
 
 .search-bar input {
     width: 100%;
     padding: 1rem 3rem 1rem 1.5rem;
-    border-radius: 50px;
+    border-radius: 15px;
     border: 1px solid #ccc;
     background: #f1f5ff;
     font-size: 1rem;
@@ -152,10 +153,10 @@ box-shadow: inset 8px 0 35px -15px rgba(0, 0, 0, 0.2);
 /* RECOMMENDED SECTION */
 .recommended {
     background: #fff;
-    padding-top: 1.5rem;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    padding-bottom: 0px;
+    padding-top: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 1rem;
 
     border-radius: 15px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.06);
@@ -167,7 +168,6 @@ box-shadow: inset 8px 0 35px -15px rgba(0, 0, 0, 0.2);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
 }
 .recommended-header h2 {
     font-size: 1.3rem;
@@ -187,10 +187,12 @@ box-shadow: inset 8px 0 35px -15px rgba(0, 0, 0, 0.2);
     gap: 1.2rem;
     overflow-x: auto;
     padding-bottom: 10px;
+    padding-top: 10px;
+
 }
 .book_images{
-    width: 110px;
-    height: 160px;
+    width: 100px;
+    height: 150px;
 
 }
 
@@ -204,7 +206,9 @@ box-shadow: inset 8px 0 35px -15px rgba(0, 0, 0, 0.2);
 
 
 .book-card {
-    width: 130px;
+    width: 140px;
+    height: 230px;
+
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -214,6 +218,7 @@ box-shadow: inset 8px 0 35px -15px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s ease;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
     border-radius: 5%;
+    padding-top: 10px;
 }
 
 
@@ -223,10 +228,7 @@ box-shadow: inset 8px 0 35px -15px rgba(0, 0, 0, 0.2);
     display: inline-block;
 }
 
-.book-author{
-    font-size: 12px;
-    color: #767676;
-}
+
 
 .book-card:hover {
     transform: translateY(-3px);
@@ -238,9 +240,13 @@ box-shadow: inset 8px 0 35px -15px rgba(0, 0, 0, 0.2);
     object-fit: cover;
 }
 .book-title {
-    font-size: 0.9rem;
+    font-size: 12px;
     font-weight: 600;
     color: #444;
+}
+.book-author{
+    font-size: 10px;
+    color: #767676;
 }
 
 /* CATEGORIES */
@@ -324,8 +330,14 @@ box-shadow: inset 8px 0 35px -15px rgba(0, 0, 0, 0.2);
     margin-bottom: 0.5rem;
     color: #fff;
 }
+.featured-book h5 {
+    font-size: 0.8rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: #8a8a8a;
+}
 .featured-book p {
-    font-size: 0.9rem;
+    font-size: 0.7rem;
     color: #cccccc;
     margin-bottom: 1rem;
     line-height: 1.4;

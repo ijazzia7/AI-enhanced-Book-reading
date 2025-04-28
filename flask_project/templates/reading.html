@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -25,82 +24,126 @@
     />
   </head>
   <body>
-    <header>
-
-    </header>
+    <header></header>
 
     <main>
+      <div id="popup">
+        <button class="popup_buttons">
+          <img
+            src="static/images/annotate.png"
+            alt="icon"
+            class="button_icon"
+          />Annotate
+        </button>
+        <button class="popup_buttons">
+          <img
+            src="static/images/highlight.png"
+            alt="icon"
+            class="button_icon"
+            id="highlight-button"
+          />Highlight
+        </button>
 
-      <div id= 'popup'>
-        <button class="popup_buttons"><img src="static/images/annotate.png" alt="icon" class="button_icon">Annotate</button>
-        <button class="popup_buttons"><img src="static/images/highlight.png" alt="icon" class="button_icon" id='highlight-button'>Highlight</button>
-
-
-        <button class="popup_buttons" id='bookmark-button'><img src="static/images/bookmark.png" alt="icon" class="button_icon">Place Bookmark</button>
-        <button class="popup_buttons"><img src="static/images/notes.png" alt="icon" class="button_icon" id='addNotesBtn'>Notes</button>
-        <button class="popup_buttons"><img src="static/images/visualize.png" alt="icon" class="button_icon">Visualize Para</button>
+        <button class="popup_buttons" id="bookmark-button">
+          <img
+            src="static/images/bookmark.png"
+            alt="icon"
+            class="button_icon"
+          />Place Bookmark
+        </button>
+        <button class="popup_buttons">
+          <img
+            src="static/images/notes.png"
+            alt="icon"
+            class="button_icon"
+            id="addNotesBtn"
+          />Notes
+        </button>
+        <button class="popup_buttons">
+          <img
+            src="static/images/visualize.png"
+            alt="icon"
+            class="button_icon"
+          />Visualize Para
+        </button>
       </div>
 
-        <div id="wrapper">
-            <div id="container">
-        
-                <section class="open-book">
-
-                  <div class="bookmark-icon" id="displayBookmark">
-                    <img src="static/images/bookmark_to_display.png" alt="Bookmark">
-                  </div>
-
-                    <header>
-                        <h1 id='book_name'>The Kite Runner</h1>
-                        <h6 id='author'>Khaled Husseni</h6>
-                    </header>
-                    <article>
-                        <div id="bothPages">
-
-                            <div id="book-content-1" class = 'book-content'>
-                            </div>
-                            <div id="book-content-2" class = 'book-content'>
-                            </div>
-                        </div>
-                    </article>
-                    <footer>
-                        <div id="page-numbers">
-                            <div id='page-number-1'>1</div>
-                            <div id='page-number-2'>2</div>
-                        </div>
-                    </footer>
-
-
-                </section>
-
-                <button id="next-button">Next</button>
-                <button id="prev-button">Back</button>
-                
-      
-        
+      <div id="wrapper">
+        <div id="container">
+          <section class="open-book">
+            <div class="bookmark-icon" id="displayBookmark">
+              <img src="static/images/bookmark_to_display.png" alt="Bookmark" />
             </div>
-        </div>
 
-        <div id= 'popup'>
-          <button class="popup_buttons" id="simple-meaning"><img src="static/images/meaning.png" alt="icon" class="button_icon">Meaning</button>
-          <button class="popup_buttons" id="contextual-meaning"><img src="static/images/context.png" alt="icon" class="button_icon">Contextual Meaning</button>
-          <button class="popup_buttons" id="create-sentence"><img src="static/images/sentence.png" alt="icon" class="button_icon">Create Sentence</button>
-          <button class="popup_buttons" id="generate-audio"><img src="static/images/speak.png" alt="icon" class="button_icon">Speak</button>
-          <button class="popup_buttons" id="vis-para"><img src="static/images/visualize.png" alt="icon" class="button_icon">Visualize Para</button>
-        </div>
+            <header>
+              <h1 id="book_name">The Kite Runner</h1>
+              <h6 id="author">Khaled Husseni</h6>
+            </header>
+            <article>
+              <div id="bothPages">
+                <div id="book-content-1" class="book-content"></div>
+                <div id="book-content-2" class="book-content"></div>
+              </div>
+            </article>
+            <footer>
+              <div id="page-numbers">
+                <div id="page-number-1">1</div>
+                <div id="page-number-2">2</div>
+              </div>
+            </footer>
+          </section>
 
-  
-        <div class='notes_section'>
-          <div class="sticky-container">
-          <!--   sticky notes are created here -->
-          </div>
+          <button id="next-button">Next</button>
+          <button id="prev-button">Back</button>
+        </div>
       </div>
-      
-        
+
+      <div id="popup">
+        <button class="popup_buttons" id="simple-meaning">
+          <img
+            src="static/images/meaning.png"
+            alt="icon"
+            class="button_icon"
+          />Meaning
+        </button>
+        <button class="popup_buttons" id="contextual-meaning">
+          <img
+            src="static/images/context.png"
+            alt="icon"
+            class="button_icon"
+          />Contextual Meaning
+        </button>
+        <button class="popup_buttons" id="create-sentence">
+          <img
+            src="static/images/sentence.png"
+            alt="icon"
+            class="button_icon"
+          />Create Sentence
+        </button>
+        <button class="popup_buttons" id="generate-audio">
+          <img
+            src="static/images/speak.png"
+            alt="icon"
+            class="button_icon"
+          />Speak
+        </button>
+        <button class="popup_buttons" id="vis-para">
+          <img
+            src="static/images/visualize.png"
+            alt="icon"
+            class="button_icon"
+          />Visualize Para
+        </button>
+      </div>
+
+      <div class="notes_section">
+        <div class="sticky-container">
+          <!--   sticky notes are created here -->
+        </div>
+      </div>
     </main>
 
-    <footer>
-    </footer>
+    <footer></footer>
 
     <script src="{{ url_for('static', filename='reading.js') }}"></script>
   </body>

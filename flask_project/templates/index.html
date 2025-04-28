@@ -39,13 +39,19 @@
     <main>
       <!-- Book (left-side) -->
 
-      <div id= 'popup2'>
-        <button class="popup_buttons2" id="home-icon"><img src="static/images/home.png" alt="icon" class="button_icon"></button>
-        <button class="popup_buttons2" id="contextual-meaning"><img src="static/images/continue_reading.png" alt="icon" class="button_icon"></button>
-       
+      <div id="popup2">
+        <button class="popup_buttons2" id="home-icon">
+          <img src="static/images/home.png" alt="icon" class="button_icon" />
+        </button>
+        <button class="popup_buttons2" id="contextual-meaning">
+          <img
+            src="static/images/continue_reading.png"
+            alt="icon"
+            class="button_icon"
+          />
+        </button>
       </div>
       <div class="vertical-line"></div>
-
 
       <div id="reading-container">
         <div id="book-content">
@@ -58,18 +64,48 @@
             <span id="page_num" controls></span>
           </div>
           <button id="next-button">Next</button>
-          <audio id="audio-player" controls style="display: none;"></audio>
+          <audio id="audio-player" controls style="display: none"></audio>
         </div>
       </div>
 
-        <div id= 'popup'>
-          <button class="popup_buttons" id="simple-meaning"><img src="static/images/meaning.png" alt="icon" class="button_icon">Meaning</button>
-          <button class="popup_buttons" id="contextual-meaning"><img src="static/images/context.png" alt="icon" class="button_icon">Contextual Meaning</button>
-          <button class="popup_buttons" id="create-sentence"><img src="static/images/sentence.png" alt="icon" class="button_icon">Create Sentence</button>
-          <button class="popup_buttons" id="generate-audio"><img src="static/images/speak.png" alt="icon" class="button_icon">Speak</button>
-          <button class="popup_buttons" id="vis-para"><img src="static/images/visualize.png" alt="icon" class="button_icon">Visualize Para</button>
-        </div>
-        
+      <div id="popup">
+        <button class="popup_buttons" id="simple-meaning">
+          <img
+            src="static/images/meaning.png"
+            alt="icon"
+            class="button_icon"
+          />Meaning
+        </button>
+        <button class="popup_buttons" id="contextual-meaning">
+          <img
+            src="static/images/context.png"
+            alt="icon"
+            class="button_icon"
+          />Contextual Meaning
+        </button>
+        <button class="popup_buttons" id="create-sentence">
+          <img
+            src="static/images/sentence.png"
+            alt="icon"
+            class="button_icon"
+          />Create Sentence
+        </button>
+        <button class="popup_buttons" id="generate-audio">
+          <img
+            src="static/images/speak.png"
+            alt="icon"
+            class="button_icon"
+          />Speak
+        </button>
+        <button class="popup_buttons" id="vis-para">
+          <img
+            src="static/images/visualize.png"
+            alt="icon"
+            class="button_icon"
+          />Visualize Para
+        </button>
+      </div>
+
       <!-- functionality (right side) -->
       <div id="side-panel">
         <div class="side-tabs">
@@ -98,12 +134,10 @@
               <button id="chat-send-button">
                 <i class="fab fa-telegram-plane">Send</i>
               </button>
-              
             </div>
           </div>
           <!-- Insights Tab -->
           <div id="insights-container" style="display: none">
-           
             <!-- Generated outputs appear here -->
           </div>
           <!-- Visualization Tab -->
