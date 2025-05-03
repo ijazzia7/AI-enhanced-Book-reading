@@ -2,10 +2,10 @@ from flask import Flask, render_template, jsonify, request, send_file
 import pdfplumber
 from llm_service import LLMService, Text2SpeechService, ChatWithBook, Summarization, audio_to_text, Visualization
 from langchain.prompts import ChatPromptTemplate
-#from flair.data import Sentence
-#from flair.models import SequenceTagger
+from flair.data import Sentence
+from flair.models import SequenceTagger
 import numpy as np
-
+import requests
 
 app = Flask(__name__)
 #model = LLMService()
@@ -24,7 +24,7 @@ vis = 1
 
 
 
-#tagger = SequenceTagger.load("flair/ner-english-fast")
+tagger = SequenceTagger.load("flair/ner-english-fast")
 # PDF Book Path and Chunk Size
 BOOK_PATH = "static/books/my_book-10.pdf"
 CHUNK_SIZE = 500  # Number of characters per chunk
@@ -53,15 +53,21 @@ def index():
 @app.route('/get_page/<int:page_num>', methods=['GET'])
 def get_page(page_num):
     if 0 <= page_num < len(book_pages):
-        #print(book_pages[page_num])
-        #sentence = Sentence(book_pages[page_num])
-        #tagger.predict(sentence)
-        #l=[]
-        #for entity in sentence.get_spans('ner'):
+        
+        # print(book_pages[page_num])
+        # sentence = Sentence(book_pages[page_num])
+        # tagger.predict(sentence)
+        # l=[]
+        # for entity in sentence.get_spans('ner'):
         #    if (entity.tag =='PER') & (entity.score > 0.95):
         #        l.append(entity.text)
-        #characters_dict[page_num] = list(set(l))
-        #characters = characters_to_display(characters_dict).tolist()
+        # characters_dict[page_num] = list(set(l))
+        # characters = characters_to_display(characters_dict).tolist()
+        # if len(characters)==0:
+        #     characters='none'
+        
+        # print(characters)
+        
         page_1 = book_pages[page_num]
         page_2 = book_pages[page_num+1]
         
@@ -220,8 +226,36 @@ def get_image():
 
 
 
-
-
+# Dictionary Request
+#------------------------------------------------------------------------------------------------
+@app.route('/dictionary', methods=['POST'])  
+def get_word_definition():
+    word = request.get_json()
+    print(word)
+    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        try:
+            phonetic = [i for i in data if 'phonetic' in i][0]['phonetic']
+        except:
+            phonetic = 'phonetic not available'
+        meanings = [len(i['meanings']) for i in data]
+        ind = np.argmax(meanings)
+        meaning = [i['meanings'] for i in data][ind]
+        pos = [i['partOfSpeech'] for i in meaning]
+        t=f'<strong>{phonetic}</strong><br><br>'
+        for x in range(len(meaning)):
+            t += f'<strong>Meaning (as {pos[x]})</strong> :<br>{[i['definition'] for i in meaning[x]['definitions']][0]}<br><br>'
+        t = t.rstrip()
+        print(t)
+    else:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+        return jsonify({"error": "No text received."}), 400
+    
+    return jsonify({"def": t}), 200
+#------------------------------------------------------------------------------------------------
 
 
 if __name__ == '__main__':

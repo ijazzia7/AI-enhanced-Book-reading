@@ -27,45 +27,66 @@
     <header></header>
 
     <main>
-      <div id="popup">
-        <button class="popup_buttons">
-          <img
-            src="static/images/annotate.png"
-            alt="icon"
-            class="button_icon"
-          />Annotate
-        </button>
-        <button class="popup_buttons">
-          <img
-            src="static/images/highlight.png"
-            alt="icon"
-            class="button_icon"
-            id="highlight-button"
-          />Highlight
-        </button>
+      <div id="popupOverlay" class="popup-overlay hidden">
+        <div class="popup-content">
+          <h2></h2>
+          <p></p>
+          <button id="closePopup">Close</button>
+        </div>
+      </div>
 
-        <button class="popup_buttons" id="bookmark-button">
-          <img
-            src="static/images/bookmark.png"
-            alt="icon"
-            class="button_icon"
-          />Place Bookmark
-        </button>
-        <button class="popup_buttons">
-          <img
-            src="static/images/notes.png"
-            alt="icon"
-            class="button_icon"
-            id="addNotesBtn"
-          />Notes
-        </button>
-        <button class="popup_buttons">
-          <img
-            src="static/images/visualize.png"
-            alt="icon"
-            class="button_icon"
-          />Visualize Para
-        </button>
+      <div class="popup_with_chatbot">
+        <div class="chatbot">
+          <button class="popup_button_chatbot" id="charactersButton">
+            <img
+              src="static/images/person.png"
+              alt="icon"
+              class="button_icon_chatbot"
+            />
+          </button>
+        </div>
+
+        <div id="popup">
+          <button class="popup_buttons">
+            <img
+              src="static/images/annotate.png"
+              alt="icon"
+              class="button_icon"
+            />Annotate
+          </button>
+          <button class="popup_buttons">
+            <img
+              src="static/images/highlight.png"
+              alt="icon"
+              class="button_icon"
+              id="highlight-button"
+            />Highlight
+          </button>
+
+          <button class="popup_buttons" id="bookmark-button">
+            <img
+              src="static/images/bookmark.png"
+              alt="icon"
+              class="button_icon"
+            />Place Bookmark
+          </button>
+          <button class="popup_buttons">
+            <img
+              src="static/images/notes.png"
+              alt="icon"
+              class="button_icon"
+              id="addNotesBtn"
+            />Notes
+          </button>
+          <button class="popup_buttons">
+            <img
+              src="static/images/dictionary.png"
+              alt="icon"
+              class="button_icon"
+              id="dictionaryBtn"
+            />Dictionary
+          </button>
+        </div>
       </div>
 
       <div id="wrapper">
@@ -89,6 +110,11 @@
               <div id="page-numbers">
                 <div id="page-number-1">1</div>
                 <div id="page-number-2">2</div>
+                <div
+                  id="fixed-tooltip-dictionary"
+                  class="custom-tooltip-dictionary"
+                ></div>
+                <div id="fixed-tooltip-ai" class="custom-tooltip-ai"></div>
               </div>
             </footer>
           </section>
@@ -97,43 +123,53 @@
           <button id="prev-button">Back</button>
         </div>
       </div>
-
-      <div id="popup">
-        <button class="popup_buttons" id="simple-meaning">
-          <img
-            src="static/images/meaning.png"
-            alt="icon"
-            class="button_icon"
-          />Meaning
-        </button>
-        <button class="popup_buttons" id="contextual-meaning">
-          <img
-            src="static/images/context.png"
-            alt="icon"
-            class="button_icon"
-          />Contextual Meaning
-        </button>
-        <button class="popup_buttons" id="create-sentence">
-          <img
-            src="static/images/sentence.png"
-            alt="icon"
-            class="button_icon"
-          />Create Sentence
-        </button>
-        <button class="popup_buttons" id="generate-audio">
-          <img
-            src="static/images/speak.png"
-            alt="icon"
-            class="button_icon"
-          />Speak
-        </button>
-        <button class="popup_buttons" id="vis-para">
-          <img
-            src="static/images/visualize.png"
-            alt="icon"
-            class="button_icon"
-          />Visualize Para
-        </button>
+      <div class="popup_with_chatbot">
+        <div id="popup">
+          <button class="popup_buttons" id="simple-meaning">
+            <img
+              src="static/images/meaning.png"
+              alt="icon"
+              class="button_icon"
+            />Meaning
+          </button>
+          <button class="popup_buttons" id="contextual-meaning">
+            <img
+              src="static/images/context.png"
+              alt="icon"
+              class="button_icon"
+            />Contextual Meaning
+          </button>
+          <button class="popup_buttons" id="create-sentence">
+            <img
+              src="static/images/sentence.png"
+              alt="icon"
+              class="button_icon"
+            />Create Sentence
+          </button>
+          <button class="popup_buttons" id="generate-audio">
+            <img
+              src="static/images/speak.png"
+              alt="icon"
+              class="button_icon"
+            />Speak
+          </button>
+          <button class="popup_buttons" id="vis-para">
+            <img
+              src="static/images/visualize.png"
+              alt="icon"
+              class="button_icon"
+            />Visualize Para
+          </button>
+        </div>
+        <div class="chatbot">
+          <button class="popup_button_chatbot">
+            <img
+              src="static/images/chatbot.png"
+              alt="icon"
+              class="button_icon_chatbot"
+            />
+          </button>
+        </div>
       </div>
 
       <div class="notes_section">
