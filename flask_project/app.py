@@ -1,11 +1,12 @@
 from flask import Flask, render_template, jsonify, request, send_file
 import pdfplumber
-from llm_service import LLMService, Text2SpeechService, ChatWithBook, Summarization, audio_to_text, Visualization
+from llm_service import LLMService, Text2SpeechService, ChatWithBook, Summarization, audio_to_text, Visualization, characterUpdate
 from langchain.prompts import ChatPromptTemplate
 from flair.data import Sentence
 from flair.models import SequenceTagger
 import numpy as np
 import requests
+import time
 
 app = Flask(__name__)
 #model = LLMService()
@@ -21,6 +22,7 @@ vis = Visualization()
 summary = 1
 audio = 1
 vis = 1
+updateCharacter = characterUpdate()
 
 
 
@@ -54,19 +56,17 @@ def index():
 def get_page(page_num):
     if 0 <= page_num < len(book_pages):
         
-        # print(book_pages[page_num])
-        # sentence = Sentence(book_pages[page_num])
-        # tagger.predict(sentence)
-        # l=[]
-        # for entity in sentence.get_spans('ner'):
-        #    if (entity.tag =='PER') & (entity.score > 0.95):
-        #        l.append(entity.text)
-        # characters_dict[page_num] = list(set(l))
-        # characters = characters_to_display(characters_dict).tolist()
-        # if len(characters)==0:
-        #     characters='none'
+        sentence = Sentence(book_pages[page_num])
+        tagger.predict(sentence)
+        l=[]
+        for entity in sentence.get_spans('ner'):
+           if (entity.tag =='PER') & (entity.score > 0.95):
+               l.append(entity.text)
+        characters_dict[page_num] = list(set(l))
+        characters = characters_to_display(characters_dict).tolist()
+        if len(characters)==0:
+            characters='none'
         
-        # print(characters)
         
         page_1 = book_pages[page_num]
         page_2 = book_pages[page_num+1]
@@ -82,9 +82,21 @@ def get_page(page_num):
         else:
             new_chap='none'
             chap_name='none'
-        
-        return jsonify({'page1': page_1,'page2': page_2,'chap': new_chap,'chapterName':chap_name, 'next_page': page_num + 2, 'prev_page': page_num - 2})#, 'characters':characters})
+
+        return jsonify({'page1': page_1,'page2': page_2,'chap': new_chap,'chapterName':chap_name, 'next_page': page_num + 2, 'prev_page': page_num - 2, 'characters':characters})
     return jsonify({'page': '', 'next_page': None, 'prev_page': None})  # End of book
+
+
+# def create_characters(characters):
+#     dictionary= {}
+#     for name in characters:
+#         dictionary[name]={'image':'s'}
+    
+
+
+
+
+
 
 @app.route('/book-link') 
 def reading_page():
@@ -92,7 +104,7 @@ def reading_page():
 
 def characters_to_display(characters_dict):
     l = list(characters_dict.values())
-    l = [item for sublist in l for item in sublist]
+    l = [item.replace('  ', ' ') for sublist in l for item in sublist]
     unique = set(l)
     count_dict ={}
     for x in range(len(unique)):
@@ -133,7 +145,6 @@ def contextual_meaning():
         final_prompt = messages[0].content
         #output = model.generate_response(final_prompt, 1)
         output = 'Lorem ipsum this is a testing meaning of the word. This should be replaced by the model output'
-        #print(output)
         return jsonify({"LLM_output": output}), 200
     return jsonify({"error": "No text received."}), 400
 
@@ -180,8 +191,8 @@ def chatting():
     question = data.get('question')
     page_num = data.get('page_number')
     if question:
-        #output = chat_bot.chat(question, page_num)
-        output = 'Hello how can we help you? This is a dummy response. A dummy response'
+        output = chat_bot.chat(question, page_num)
+        #output = 'Hello how can we help you? This is a dummy response. #A dummy response'
         return jsonify({"chat_reply": output}), 200
     return jsonify({"error": "No text received."}), 400
 
@@ -231,7 +242,6 @@ def get_image():
 @app.route('/dictionary', methods=['POST'])  
 def get_word_definition():
     word = request.get_json()
-    print(word)
     url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
     response = requests.get(url)
     if response.status_code == 200:
@@ -247,14 +257,35 @@ def get_word_definition():
         t=f'<strong>{phonetic}</strong><br><br>'
         for x in range(len(meaning)):
             t += f'<strong>Meaning (as {pos[x]})</strong> :<br>{[i['definition'] for i in meaning[x]['definitions']][0]}<br><br>'
-        t = t.rstrip()
-        print(t)
+        t = t.rstrip()       
     else:
         print(f"Error: {response.status_code}")
         print(response.text)
         return jsonify({"error": "No text received."}), 400
     
     return jsonify({"def": t}), 200
+#------------------------------------------------------------------------------------------------
+    
+# Character Update 
+@app.route('/updateCharacter', methods=['POST'])  
+def update_description():
+    data = request.get_json() 
+    current_desc = data.get("current_desc")
+    char = data.get("char")
+    p1 = data.get("p1")
+    p2 = data.get("p2")
+    print(char)
+    
+
+    #output = updateCharacter.generate_response(current_desc, char, p1, p2)
+    time.sleep(7) 
+    output = f'{char} Dummy Output character description For character'
+    print(output)
+    
+    return jsonify({"output": output})  
+
+
+
 #------------------------------------------------------------------------------------------------
 
 

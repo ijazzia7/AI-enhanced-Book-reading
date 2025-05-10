@@ -27,17 +27,48 @@
     <header></header>
 
     <main>
-      <div id="popupOverlay" class="popup-overlay hidden">
+      <!--<div id="popupOverlay" class="popup-overlay hidden">
         <div class="popup-content">
           <h2></h2>
           <p></p>
           <button id="closePopup">Close</button>
         </div>
+      </div> -->
+      <!-- Modal -->
+      <div class="modal-overlay" id="modalOverlay">
+        <div
+          class="modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modalTitle"
+          aria-describedby="modalDesc"
+        >
+          <button class="modal-close" aria-label="Close">&times;</button>
+          <div class="modal-content">
+            <img src="" alt="" id="modalImg" />
+            <h2 id="modalTitle">Character Name</h2>
+            <p id="modalDesc">Character description goes here.</p>
+          </div>
+          <div class="modal-footer">
+            <button class="prev" aria-label="Previous Character">
+              &larr; Prev
+            </button>
+            <button class="next" aria-label="Next Character">
+              Next &rarr;
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="popup_with_chatbot">
-        <div class="chatbot">
+        <div class="characters">
           <button class="popup_button_chatbot" id="charactersButton">
+            <span
+              id="charBadge"
+              class="notification-badge"
+              style="display: none"
+              >!</span
+            >
             <img
               src="static/images/person.png"
               alt="icon"
@@ -119,8 +150,8 @@
             </footer>
           </section>
 
-          <button id="next-button">Next</button>
           <button id="prev-button">Back</button>
+          <button id="next-button">Next</button>
         </div>
       </div>
       <div class="popup_with_chatbot">
@@ -161,23 +192,40 @@
             />Visualize Para
           </button>
         </div>
-        <div class="chatbot">
-          <button class="popup_button_chatbot">
-            <img
-              src="static/images/chatbot.png"
-              alt="icon"
-              class="button_icon_chatbot"
-            />
-          </button>
-        </div>
       </div>
-
+      <div class="overlay" id="overlay"></div>
       <div class="notes_section">
         <div class="sticky-container">
           <!--   sticky notes are created here -->
         </div>
       </div>
     </main>
+    <div class="chatbot" id="chatbot">
+      <div class="chatbot__header" id="toggle">
+        <p>Literary Assistant</p>
+        <svg class="chatbot__close-button" viewBox="0 0 24 24">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </div>
+      <div class="chatbot__message-window">
+        <ul class="chatbot__messages" id="messages">
+          <li class="is-ai">
+            <div class="chatbot__arrow"></div>
+            <div class="chatbot__message">
+              Hello, ask me anything about the book.
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="chatbot__entry">
+        <input
+          class="chatbot__input"
+          id="input"
+          placeholder="Start chatting with our AI..."
+        />
+        <button class="chatbot__submit" id="send">Send</button>
+      </div>
+    </div>
 
     <footer></footer>
 

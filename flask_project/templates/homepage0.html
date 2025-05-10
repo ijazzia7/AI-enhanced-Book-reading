@@ -16,7 +16,7 @@
       <!-- Left Sidebar -->
       <div class="sidebar">
         <div>
-          <div class="brand"><span>Book</span><span>Base</span></div>
+          <div class="brand">BookBase</div>
           <div class="nav-links">
             <a href="#">Discover</a>
             <a href="#">Recommended</a>
@@ -32,12 +32,8 @@
         <!-- Search Bar -->
         <div class="search-background">
           <div class="search-bar">
-            <img
-              src="static/images/search-icon.png"
-              alt="search-icon"
-              class="search-icon"
-            />
             <input type="text" placeholder="Search your favourite books" />
+            <span class="search-icon">&#128269;</span>
           </div>
 
           <div class="user-profile">
@@ -54,7 +50,6 @@
                 <h2>Recommended</h2>
                 <a href="#">See All</a>
               </div>
-
               <div class="books-row">
                 <a href="/book-link" class="book-link">
                   <div class="book-card">
@@ -104,7 +99,7 @@
                   </div>
                 </a>
 
-                <!-- <a href="/book-link" class="book-link">
+                <a href="/book-link" class="book-link">
                   <div class="book-card">
                     <img
                       class="book_images"
@@ -114,17 +109,16 @@
                     <div class="book-title">White Nights</div>
                     <div class="book-author">Fyodor Dostoevsky</div>
                   </div>
-                </a> -->
+                </a>
               </div>
             </div>
 
             <!-- Categories Section -->
             <div class="categories">
               <div class="categories-header">
-                <h2>Categories</h2>
+                <h3>Categories</h3>
               </div>
               <div class="categories-tabs">
-                <div class="category-item active">All</div>
                 <div class="category-item">Business</div>
                 <div class="category-item">Finance</div>
                 <div class="category-item">Education</div>
@@ -135,8 +129,6 @@
                 <div class="category-item">Romance</div>
                 <div class="category-item">Sci-Fi</div>
               </div>
-
-              <div class="categories-books"></div>
             </div>
           </div>
 
@@ -167,8 +159,5 @@
         </div>
       </div>
     </div>
-
-    <!-- JavaScript -->
-    <script src="{{ url_for('static', filename='homepage.js') }}"></script>
   </body>
 </html>

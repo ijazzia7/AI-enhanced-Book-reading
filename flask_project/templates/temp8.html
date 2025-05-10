@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Character Modal</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 2rem;
+        background: #f5f5f5;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      #openModal {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        border: none;
+        background: #007bff;
+        color: white;
+        border-radius: 5px;
+      }
+
+      /* Modal Overlay */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        z-index: 9999;
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* Modal */
+      .modal {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        width: 90%;
+        max-width: 500px;
+        padding: 20px;
+        position: relative;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+      }
+
+      .modal-overlay.active .modal {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .modal img {
+        width: 100%;
+        border-radius: 6px;
+        object-fit: cover;
+      }
+
+      .modal h2 {
+        margin-top: 1rem;
+        font-size: 1.5rem;
+      }
+
+      .modal p {
+        margin: 0.75rem 0;
+        line-height: 1.5;
+        color: #444;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #888;
+      }
+
+      .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+      }
+
+      .modal-footer button {
+        background: none;
+        border: none;
+        color: #007bff;
+        font-size: 1rem;
+      }
+
+      .modal-content {
+        transition: opacity 0.3s ease;
+      }
+
+      .fade-out {
+        opacity: 0;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .modal,
+        .modal-overlay,
+        .modal-content {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button id="charactersButton">View Characters</button>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+        aria-describedby="modalDesc"
+      >
+        <button class="modal-close" aria-label="Close">&times;</button>
+        <div class="modal-content">
+          <img src="" alt="" id="modalImg" />
+          <h2 id="modalTitle">Character Name</h2>
+          <p id="modalDesc">Character description goes here.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="prev" aria-label="Previous Character">
+            &larr; Prev
+          </button>
+          <button class="next" aria-label="Next Character">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const characters = [
+        {
+          name: "Alice",
+          image: "https://via.placeholder.com/500x250?text=Alice",
+          description:
+            "Alice is a curious explorer from the East. She's known for her adventurous spirit and clever ideas.",
+        },
+        {
+          name: "Bob",
+          image: "https://via.placeholder.com/500x250?text=Bob",
+          description:
+            "Bob is a strong warrior with a mysterious past. He protects his people and believes in justice.",
+        },
+        {
+          name: "Clara",
+          image: "https://via.placeholder.com/500x250?text=Clara",
+          description:
+            "Clara is a healer with a deep knowledge of ancient magic. Her kindness hides a powerful strength.",
+        },
+      ];
+
+      let currentIndex = 0;
+      let lastFocused = null;
+
+      const overlay = document.getElementById("modalOverlay");
+      const modal = overlay.querySelector(".modal");
+      const closeButton = modal.querySelector(".modal-close");
+      const prevButton = modal.querySelector(".prev");
+      const nextButton = modal.querySelector(".next");
+      const titleEl = modal.querySelector("#modalTitle");
+      const descEl = modal.querySelector("#modalDesc");
+      const imgEl = modal.querySelector("#modalImg");
+      const contentEl = modal.querySelector(".modal-content");
+
+      document
+        .getElementById("charactersButton")
+        .addEventListener("click", () => openModal(0));
+      closeButton.addEventListener("click", closeModal);
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeModal();
+      });
+      nextButton.addEventListener("click", showNext);
+      prevButton.addEventListener("click", showPrev);
+
+      function openModal(index = 0) {
+        lastFocused = document.activeElement;
+        currentIndex = index;
+        updateContent();
+        overlay.classList.add("active");
+        closeButton.focus();
+        document.body.style.overflow = "hidden";
+        document.addEventListener("keydown", handleKeyDown);
+      }
+
+      function closeModal() {
+        overlay.classList.remove("active");
+        document.body.style.overflow = "";
+        if (lastFocused) lastFocused.focus();
+        document.removeEventListener("keydown", handleKeyDown);
+      }
+
+      function updateContent() {
+        const char = characters[currentIndex];
+        imgEl.src = char.image;
+        imgEl.alt = "Portrait of " + char.name;
+        titleEl.textContent = char.name;
+        descEl.textContent = char.description;
+      }
+
+      function showNext() {
+        if (currentIndex < characters.length - 1) {
+          currentIndex++;
+          animateContentChange();
+        }
+      }
+
+      function showPrev() {
+        if (currentIndex > 0) {
+          currentIndex--;
+          animateContentChange();
+        }
+      }
+
+      function animateContentChange() {
+        contentEl.classList.add("fade-out");
+        contentEl.addEventListener(
+          "transitionend",
+          function handler() {
+            updateContent();
+            contentEl.classList.remove("fade-out");
+            contentEl.removeEventListener("transitionend", handler);
+          },
+          { once: true }
+        );
+      }
+
+      function handleKeyDown(e) {
+        if (e.key === "Escape") closeModal();
+        if (e.key === "ArrowRight") showNext();
+        if (e.key === "ArrowLeft") showPrev();
+        if (e.key === "Tab") {
+          const focusables = modal.querySelectorAll("button");
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

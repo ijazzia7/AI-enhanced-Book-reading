@@ -18,6 +18,20 @@ const bookmarkedPages = [];
 const highlightedTexts = {};
 
 
+let characters_list = [];
+let characters_list_updated=[];
+const overlay2 = document.getElementById("modalOverlay");
+const modal = overlay2.querySelector(".modal");
+const closeButton = modal.querySelector(".modal-close");
+const prevButton2 = modal.querySelector(".prev");
+const nextButton2 = modal.querySelector(".next");
+const titleEl = modal.querySelector("#modalTitle");
+const descEl = modal.querySelector("#modalDesc");
+const imgEl = modal.querySelector("#modalImg");
+const contentEl = modal.querySelector(".modal-content");
+let setTo=false;
+let newDescriptions = {};
+let knownCharacters = new Set();
 
 
 
@@ -32,12 +46,13 @@ function loadPage(pageNum) {
           bookContentEl2.innerHTML = `<p>${data.page2}</p>`;
           on_page = data.chap;
           chapter_title = data.chapterName;
-          characters_list = data.characters_list;
+          characters_list = data.characters;
           if (on_page!='none'){
           display_title(on_page, chapter_title)
         }
           prevButton.disabled = data.prev_page < 0;
           nextButton.disabled = data.next_page === null;
+
           // Re-highlight all processed words on this page
           for (let word in highlightedWordsBlue) {
             highlightAllOccurrences(word, highlightedWordsBlue[word], false);
@@ -45,14 +60,73 @@ function loadPage(pageNum) {
           for (let word in highlightedWordsRed) {
             highlightAllOccurrences(word, highlightedWordsRed[word], true);
           }
-          // for (let name of characters_list) {
-          //   console.log(name);
-          //   highlightAllOccurrencesTest(name, true);
-          // }
-          // console.log(characters_list)
-          // if (characters_list!='none')
-          // {highlightFirstOccurrences(characters_list, false);}
+          console.log(characters_list);
+          // CHECK IF A NEW CHARACTER IS FOUND
+
+          let newFound = false;
+          for (let char of characters_list) {
+            if (!knownCharacters.has(char)) {
+              knownCharacters.add(char);
+              newFound = true;
+            }
+          }
+
+          const badge = document.getElementById("charBadge");
+          if (newFound) {
+            badge.style.display = "inline";
+          }
+
+
           
+          if (characters_list=='none') 
+          {
+            setTo=true;      
+          }
+
+          else
+          {
+            if (data.next_page%10 == 0) 
+            {
+              p2 = data.next_page
+              p1 = p2 - 10
+              const updateAllDescriptions = async () =>
+              {
+                  for (let i = 0; i < characters_list_updated.length; i++) {
+                  let char = characters_list_updated[i]['name'];
+                  let currentDesc = characters_list_updated[i]['description'];
+                  output = await updateCharacterDescription(currentDesc, char, p1, p2)
+                  newDescriptions[char] = output;
+                };
+                              
+                package = buildOrUpdateCharacters({
+                  names: characters_list,
+                  existingCharacters: characters_list_updated,
+                  descriptions: newDescriptions,
+                  update: true
+                });   
+                characters_list_updated = package['characterList']
+                newDescriptions = package['descriptionsAll']
+              }
+              updateAllDescriptions();
+            }   
+             
+            else
+            {
+              package = buildOrUpdateCharacters({ names: characters_list, descriptions: newDescriptions});
+              characters_list_updated = package['characterList']
+              newDescriptions = package['descriptionsAll']
+              setTo=false;
+              
+            }
+          }
+
+          document.getElementById("charactersButton").addEventListener("click", () => openModal(0, setTo));
+          closeButton.addEventListener("click", closeModal);
+          overlay2.addEventListener("click", (e) => {
+          if (e.target === overlay2) closeModal();});
+          nextButton2.addEventListener("click", showNext);
+          prevButton2.addEventListener("click", showPrev);
+
           
         } else {
           bookContentEl1.innerHTML = "<p>End of Book</p>";
@@ -519,44 +593,159 @@ bookmarkButton.addEventListener("click", () => {
 
   // NOTES LOGIC
 
-  const addBtn = document.querySelector("#addNotesBtn");
+//   const addBtn = document.querySelector("#addNotesBtn");
 
-addBtn.addEventListener("click", ()=>{
-    let stickyCont = document.querySelector(".sticky-container");
-    let stickySingle = document.createElement('div');
-    stickySingle.classList.add('sticky');
-    stickySingle.contentEditable = "true";
-    stickySingle.setAttribute = ("role","textbox");
-    stickySingle.innerHTML = "Write me<br>"
-    stickyCont.appendChild(stickySingle);
+// addBtn.addEventListener("click", ()=>{
+//     let stickyCont = document.querySelector(".sticky-container");
+//     let stickySingle = document.createElement('div');
+//     stickySingle.classList.add('sticky');
+//     stickySingle.contentEditable = "true";
+//     stickySingle.setAttribute = ("role","textbox");
+//     stickySingle.innerHTML = "Write me<br>"
+//     stickyCont.appendChild(stickySingle);
   
-    // Delete button
-    let close = document.createElement('span');
-    close.classList.add('close');
-    close.innerHTML = "X";
-    close.contentEditable = "false";
-    stickySingle.appendChild(close);
+//     // Delete button
+//     let close = document.createElement('span');
+//     close.classList.add('close');
+//     close.innerHTML = "X";
+//     close.contentEditable = "false";
+//     stickySingle.appendChild(close);
   
-    // Delete function. used "for" to bind delete button with 
-    // coresponding stickynote
-    let stickies = document.getElementsByClassName("sticky");
-    let xs = document.getElementsByClassName("close");
+//     // Delete function. used "for" to bind delete button with 
+//     // coresponding stickynote
+//     let stickies = document.getElementsByClassName("sticky");
+//     let xs = document.getElementsByClassName("close");
 
-    for (let i = 0; i < stickies.length; i++){
-        xs[i].addEventListener("click", ()=> {
-            stickies[i].style.display = "none";
-        });
-    }
+//     for (let i = 0; i < stickies.length; i++){
+//         xs[i].addEventListener("click", ()=> {
+//             stickies[i].style.display = "none";
+//         });
+//     }
     
-    function randomNumber(min, max) { 
-      return Math.random() * (max - min) + min; 
-    }
-    let angle = randomNumber(-3,3);
-    stickySingle.style.transform = "rotate(" + angle+"deg)";
+//     function randomNumber(min, max) { 
+//       return Math.random() * (max - min) + min; 
+//     }
+//     let angle = randomNumber(-3,3);
+//     stickySingle.style.transform = "rotate(" + angle+"deg)";
   
-    let color = randomNumber(1,720);
-    stickySingle.style.filter = "hue-rotate(" + color +"deg)";
+//     let color = randomNumber(1,720);
+//     stickySingle.style.filter = "hue-rotate(" + color +"deg)";
+// });
+// Get the elements
+// Get the elements
+// Get the elements
+const addBtn = document.querySelector("#addNotesBtn");
+const overlay = document.querySelector("#overlay");
+
+// When the user clicks the "Add Note" button
+// When the user clicks the "Add Note" button
+addBtn.addEventListener("click", () => {
+  // Show the overlay
+  overlay.style.display = "block";
+
+  let stickyCont = document.querySelector(".sticky-container");
+  let stickySingle = document.createElement("div");
+  stickySingle.classList.add("sticky");
+
+  stickySingle.contentEditable = "true";
+  stickySingle.setAttribute("role", "textbox");
+  stickySingle.innerHTML = "Write me<br>";
+
+  stickyCont.appendChild(stickySingle);
+
+  // Add a close button to remove the sticky note
+  let close = document.createElement("span");
+  close.classList.add("close");
+  close.innerHTML = "X";
+  close.contentEditable = "false";
+  stickySingle.appendChild(close);
+
+  // Close button functionality
+  close.addEventListener("click", () => {
+    stickySingle.style.display = "none";
+    overlay.style.display = "none"; // Hide the overlay
+  });
+
+  // Function for random rotation and color of sticky note
+  function randomNumber(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+  let angle = randomNumber(-3, 3);
+  stickySingle.style.transform = "rotate(" + angle + "deg)";
+
+  let color = randomNumber(1, 720);
+  stickySingle.style.filter = "hue-rotate(" + color + "deg)";
+
+  // Add a Finish button to stop editing and move the note
+  let finishBtn = document.createElement("button");
+  finishBtn.innerHTML = "Finish Note";
+  finishBtn.classList.add("finish-btn");
+  finishBtn.setAttribute("contenteditable", "false"); // Ensure it's not editable
+  stickySingle.appendChild(finishBtn);
+  // When the user clicks Finish, hide the overlay and shrink the sticky note
+  finishBtn.addEventListener("click", () => {
+    stickySingle.classList.add("hide"); // Shrink the sticky note into a circle
+    overlay.style.display = "none"; // Hide the overlay
+    makeDraggable(stickySingle); // Enable drag functionality on the dot
+  });
+
+  // Listen for focus to remove overlay and center the sticky note
+  stickySingle.addEventListener("focus", () => {
+    // The overlay stays visible when editing, no action needed here
+  });
+
+  // Listen for blur (when editing is done) and hide the overlay
+  stickySingle.addEventListener("blur", () => {
+    // If you want, you could hide the overlay after finishing writing.
+  });
+
+  // Allow clicking on the dot to reopen the sticky note
+  stickySingle.addEventListener("click", () => {
+    if (stickySingle.classList.contains("hide")) {
+      // Only allow reopening if the note is currently in the dot form
+      stickySingle.classList.remove("hide"); // Reopen the sticky note
+      stickySingle.style.position = "absolute"; // Make sure it stays in place when opened again
+      stickySingle.style.transition = "all 0.5s ease-out"; // Smooth transition
+    }
+  });
 });
+
+// Make the sticky note draggable
+function makeDraggable(note) {
+  let isDragging = false;
+  let offsetX, offsetY;
+
+  note.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    offsetX = e.clientX - note.getBoundingClientRect().left;
+    offsetY = e.clientY - note.getBoundingClientRect().top;
+    note.style.transition = "none"; // Disable transition during drag
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (isDragging) {
+      note.style.position = "absolute";
+      note.style.left = `${e.clientX - offsetX}px`;
+      note.style.top = `${e.clientY - offsetY}px`;
+    }
+  });
+
+  document.addEventListener("mouseup", () => {
+    if (isDragging) {
+      isDragging = false;
+      note.style.transition = "all 0.5s ease-in-out"; // Enable transition after drag
+    }
+  });
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -587,25 +776,262 @@ addBtn.addEventListener("click", ()=>{
 
 
  // Popup for characters
- const openBtn = document.getElementById('charactersButton');
-const closeBtn = document.getElementById('closePopup');
-const overlay = document.getElementById('popupOverlay');
+function buildOrUpdateCharacters({ 
+  names, 
+  existingCharacters = [], 
+  images = {}, 
+  descriptions = {}, 
+  update = false 
+}) {
+  
+  const charactersMap = {};
 
-openBtn.addEventListener('click', () => {
-  const popupTitle = overlay.querySelector('h2');
-  const popupMessage = overlay.querySelector('p');
-  popupTitle.textContent = 'DUMMY TITLE';
-  popupMessage.textContent = 'DUMMY MESSAGE THIS NOTHING ELSE DONT LOOK FOR SOMETHING ELSE';
-  overlay.classList.remove('hidden');
-  requestAnimationFrame(() => overlay.classList.add('show'));
+
+
+  
+  // Start with existing characters if updating
+  if (update) {
+    for (const char of existingCharacters) {
+      charactersMap[char.name] = { ...char };
+    }
+  }
+  
+  // Process each name
+  for (const name of names) {
+    const image = images[name] || `https://dummyimage.com/500x250/cccccc/000000&text=${encodeURIComponent(name)}`
+    const description = descriptions[name] || `${name} is a character whose story is yet to be written.`;
+
+    if (update && charactersMap[name]) {
+      // Update existing character
+      charactersMap[name].image = image;
+      charactersMap[name].description = description;
+    } else {
+      // Add new character
+      charactersMap[name] = {
+        name,
+        image,
+        description
+      };
+    }
+  }
+  const characterList = Object.values(charactersMap);
+  const descriptionsAll = {};
+  for (const char of characterList) {
+    descriptionsAll[char.name] = char.description;
+  }
+
+  // Return updated character list
+  return { characterList, descriptionsAll };
+}
+
+
+let currentIndex = 0;
+let lastFocused = null;
+
+
+
+function openModal(index = 0, forNone=false) {
+  document.getElementById("charBadge").style.display = "none";
+  lastFocused = document.activeElement;
+  currentIndex = index;
+  if (forNone)
+  {updateContentForNone()}
+  else
+  {updateContent()};
+  overlay2.classList.add("active");
+  closeButton.focus();
+  document.body.style.overflow = "hidden";
+  document.addEventListener("keydown", handleKeyDown);
+}
+
+function closeModal() {
+  overlay2.classList.remove("active");
+  document.body.style.overflow = "";
+  if (lastFocused) lastFocused.focus();
+  document.removeEventListener("keydown", handleKeyDown);
+}
+
+function updateContent() {
+  const char = characters_list_updated[currentIndex];
+  imgEl.src = char.image;
+  imgEl.alt = "Portrait of " + char.name;
+  titleEl.textContent = char.name;
+  descEl.textContent = char.description;
+}
+function updateContentForNone() {
+  imgEl.src = 'https://dummyimage.com/500x250/cccccc/000000&text=No+Characters';
+  imgEl.alt = "No characters found yet ";
+  titleEl.textContent = 'No major characters found yet';
+  descEl.textContent = 'No character data available at this time.';
+}
+
+function showNext() {
+  if (currentIndex < characters_list_updated.length - 1) {
+    currentIndex++;
+    animateContentChange();
+  }
+}
+
+function showPrev() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    animateContentChange();
+  }
+}
+
+function animateContentChange() {
+  contentEl.classList.add("fade-out");
+  contentEl.addEventListener(
+    "transitionend",
+    function handler() {
+      updateContent();
+      contentEl.classList.remove("fade-out");
+      contentEl.removeEventListener("transitionend", handler);
+    },
+    { once: true }
+  );
+}
+
+function handleKeyDown(e) {
+  if (e.key === "Escape") closeModal();
+  if (e.key === "ArrowRight") showNext();
+  if (e.key === "ArrowLeft") showPrev();
+  if (e.key === "Tab") {
+    const focusables = modal.querySelectorAll("button");
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+}
+
+
+// UPDATE CHARACTERS FUNCTION
+
+async function updateCharacterDescription(currentDesc, char, p1, p2) {
+  try {
+      const response = await fetch('/updateCharacter', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              current_desc: currentDesc,
+              char: char,
+              p1: p1,
+              p2: p2
+          })
+      });
+
+      const data = await response.json();
+      return data.output;
+  } catch (error) {
+      console.error('Error updating character:', error);
+  }
+}
+
+// const openBtn = document.getElementById('charactersButton');
+// const closeBtn = document.getElementById('closePopup');
+// const overlay2 = document.getElementById('popupOverlay');
+
+// openBtn.addEventListener('click', () => {
+//   const popupTitle = overlay2.querySelector('h2');
+//   const popupMessage = overlay2.querySelector('p');
+//   popupTitle.textContent = 'DUMMY TITLE';
+//   // popupMessage.textContent = 'DUMMY MESSAGE THIS NOTHING ELSE DONT LOOK FOR SOMETHING ELSE';
+//   popupMessage.textContent = characters_list;
+//   overlay2.classList.remove('hidden');
+//   requestAnimationFrame(() => overlay2.classList.add('show'));
+// });
+
+// closeBtn.addEventListener('click', () => {
+//   overlay2.classList.remove('show');
+//   setTimeout(() => overlay2.classList.add('hidden'), 400); // Match the CSS transition duration
+// });
+
+
+
+
+// CHATBOT SECTION -------------------------------------
+
+const bot = document.getElementById("chatbot"),
+toggle = document.getElementById("toggle"),
+msgs = document.getElementById("messages"),
+input = document.getElementById("input"),
+send = document.getElementById("send");
+
+toggle.addEventListener("click", () =>
+bot.classList.toggle("chatbot--open")
+);
+
+function appendMessage(text, role) {
+const li = document.createElement("li");
+li.className = role;
+const arrow = document.createElement("div");
+arrow.className = "chatbot__arrow";
+const msg = document.createElement("div");
+msg.className = "chatbot__message";
+msg.textContent = text;
+li.appendChild(arrow);
+li.appendChild(msg);
+msgs.appendChild(li);
+msgs.parentNode.scrollTop = msgs.parentNode.scrollHeight;
+}
+
+function showLoader() {
+const li = document.createElement("li");
+li.className = "is-ai";
+const arrow = document.createElement("div");
+arrow.className = "chatbot__arrow";
+const loader = document.createElement("div");
+loader.className = "loader";
+for (let i = 0; i < 3; i++) {
+  const dot = document.createElement("div");
+  dot.className = "loader__dot";
+  loader.appendChild(dot);
+}
+li.appendChild(arrow);
+li.appendChild(loader);
+msgs.appendChild(li);
+msgs.parentNode.scrollTop = msgs.parentNode.scrollHeight;
+return li;
+}
+
+send.addEventListener("click", () => {
+  const question = input.value.trim();
+  if (!question) return;
+
+  appendMessage(question, "is-user");
+  input.value = "";
+
+  const loaderLi = showLoader();
+
+  fetch("/chat_book", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question, page_number: currentPage }) // Make sure `currentPage` is defined
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      loaderLi.remove();
+      const reply = data.chat_reply || "Sorry, I didn’t quite get that.";
+      appendMessage(reply, "is-ai");
+    })
+    .catch((error) => {
+      loaderLi.remove();
+      console.error("Chat Error:", error);
+      appendMessage("Oops, something went wrong. Please try again.", "is-ai");
+    });
 });
 
-closeBtn.addEventListener('click', () => {
-  overlay.classList.remove('show');
-  setTimeout(() => overlay.classList.add('hidden'), 400); // Match the CSS transition duration
+input.addEventListener("keypress", (e) => {
+if (e.key === "Enter") send.click();
 });
-
-
 
 
  // FLIPPIMNG PAGES ---------------------------------

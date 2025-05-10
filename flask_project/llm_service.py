@@ -17,10 +17,24 @@ from langchain_community.vectorstores import Chroma
 #from langchain_chroma import Chroma
 import warnings
 warnings.filterwarnings("ignore")
+import requests
 
 from langchain.prompts import ChatPromptTemplate
+from langchain.embeddings import HuggingFaceEmbeddings
 
+hf_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+persist_dir = 'static/chroma'
+vector_db = Chroma(
+    persist_directory=persist_dir,
+    embedding_function=hf_embeddings)
 
+url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
+
+headers = {
+	"x-rapidapi-key": "d1b14716a1msh36676819b882c70p19de0ejsnab7397c0e9b5",
+	"x-rapidapi-host": "gpt-4o-mini.p.rapidapi.com",
+	"Content-Type": "application/json"
+}
 
 
 class Visualization:
@@ -54,6 +68,64 @@ class Summarization:
     
     
     
+class characterUpdate:
+    def __init__(self, api_key='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'):
+        self.client = InferenceClient(
+        provider="nebius",
+        api_key=api_key)
+    
+    def generate_response(self,current_desc, char, p1, p2):
+        docs_returned = vector_db.similarity_search(
+            f"From the following text, extract all passages that describe the physical appearance of the character '{char}'. Focus on details such as his hair, eyes, facial features, build, clothing, and any other distinctive physical attributes. Provide both the direct excerpts from the text and a summarized list of these features.",
+            k=5,
+            filter={
+                '$and': [
+                    {'page': {'$gt': p1}},
+                    {'page': {'$lt': p2}}
+                ]
+            }
+        )
+        
+        content=''
+        for i in docs_returned:
+            content+=i.page_content+'\n'
+                
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant, helping extract character description from text."},
+            {"role": "user", "content":f'''
+            You are an assistant helping write detailed character descriptions.
+            
+            Current character description:
+            {current_desc}
+            
+            New narrative content:
+            {content}
+            
+            Task:
+            - Read the new narrative content carefully.
+            - Identify **new facts, traits, backstory, or relationships** relevant to the character.
+            - Update the character description to **incorporate this new information**, while preserving the existing essence.
+            - Write the updated character description in **third person**, with a natural narrative tone.
+            - Make it clear, concise, and factual—avoid speculation.
+            - Keep the updated description under 50 words.
+            
+            Output format:
+            Updated character description:
+            <your updated version here>
+            '''},
+                       ]
+        payload = {
+            "model": "gpt-4o-mini",
+            "messages": messages
+                    }
+        response = requests.post(url, json=payload, headers=headers)
+        output = response.json()['choices'][0]['message']['content'].split('Updated character description:')[-1].strip()
+        return output
+    
+    
+    
+    
+    
 class audio_to_text:
     def __init__(self, api_key='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'):
         device = "mps" if torch.backends.mps.is_available() else "cpu"
@@ -76,10 +148,10 @@ class audio_to_text:
 class ChatWithBook:
     def __init__(self, api_key='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'):
         self.client = InferenceClient(api_key=api_key)
-        hf_embeddings = HuggingFaceEndpointEmbeddings(
-        repo_id="sentence-transformers/all-MiniLM-L6-v2",  
-        huggingfacehub_api_token=api_key
-        )
+        # hf_embeddings = HuggingFaceEndpointEmbeddings(
+        # repo_id="sentence-transformers/all-MiniLM-L6-v2",  
+        # huggingfacehub_api_token=api_key
+        # )
         # loader = PyPDFLoader("static/books/The Kite Runner.pdf", )
         # book = loader.load()
         # chunk_size = 2000
@@ -89,128 +161,177 @@ class ChatWithBook:
         # for x in range(len(splits)):
         #     splits[x].page_content = splits[x].page_content.replace('\t\r \xa0', ' ')
         
-        persist_dir = 'static/chroma'
+        
 
         # self.vector_db = Chroma.from_documents(
         # documents = splits,
         # embedding = hf_embeddings,
         # persist_directory=persist_dir
         #         )
-        self.vector_db = Chroma(persist_directory=persist_dir, embedding_function=hf_embeddings) 
+        # self.vector_db = Chroma(persist_directory=persist_dir, embedding_function=hf_embeddings) 
+        # hf_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        # persist_dir = 'static/chroma'
+        # self.vector_db = Chroma(
+        #     persist_directory=persist_dir,
+        #     embedding_function=hf_embeddings)
 
         
         
     def chat(self, question, page):
         print(question, page)
-        docs_returned = self.vector_db.similarity_search(question, k=5, filter={'page':{'$lt': page}})
+        docs_returned = vector_db.similarity_search(question, k=5, filter={'page':{'$lt': page}})
         paragraph = '\n'.join([x.page_content for x in docs_returned])
         
         print(docs_returned)
 
-        f = '''Answer the question based on the information provided in the paragraph. Do not include information that is not explicitly stated in the paragraph. If the answer cannot be found in the paragraph, respond with "The answer is not available in the paragraph."'''
+        # f = '''Answer the question based on the information provided in the paragraph. Do not include information that is not explicitly stated in the paragraph. If the answer cannot be found in the paragraph, respond with "The answer is not available in the paragraph."'''
 
-        q1 = '''Paragraph:
-        The Amazon rainforest is the largest tropical rainforest in the world, covering over 5.5 million square kilometers. It is home to diverse species of plants, animals, and indigenous communities. The rainforest plays a critical role in regulating the Earth's climate by absorbing vast amounts of carbon dioxide.
+        # q1 = '''Paragraph:
+        # The Amazon rainforest is the largest tropical rainforest in the world, covering over 5.5 million square kilometers. It is home to diverse species of plants, animals, and indigenous communities. The rainforest plays a critical role in regulating the Earth's climate by absorbing vast amounts of carbon dioxide.
 
-        Question:
-        What is the role of the Amazon rainforest in regulating the Earth's climate?'''
+        # Question:
+        # What is the role of the Amazon rainforest in regulating the Earth's climate?'''
 
-        a1 = '''Answer:
-        The Amazon rainforest regulates the Earth's climate by absorbing vast amounts of carbon dioxide.
-        '''
+        # a1 = '''Answer:
+        # The Amazon rainforest regulates the Earth's climate by absorbing vast amounts of carbon dioxide.
+        # '''
 
-        q2 = '''Paragraph:
-        Eleanor spent hours in the dimly lit library, poring over old maritime charts and journals. The more she read, the clearer it became that Captain Winslow’s final voyage was not an ordinary trading mission. The maps marked a route far north, past the usual shipping lanes, and the journal entries hinted at "treasures of the deep" that could reshape their understanding of the ocean’s depths. Yet, Eleanor found no mention of what became of the ship or its crew.
+        # q2 = '''Paragraph:
+        # Eleanor spent hours in the dimly lit library, poring over old maritime charts and journals. The more she read, the clearer it became that Captain Winslow’s final voyage was not an ordinary trading mission. The maps marked a route far north, past the usual shipping lanes, and the journal entries hinted at "treasures of the deep" that could reshape their understanding of the ocean’s depths. Yet, Eleanor found no mention of what became of the ship or its crew.
 
-        Question:
-        What clues suggested Captain Winslow’s final voyage was unusual?'''
+        # Question:
+        # What clues suggested Captain Winslow’s final voyage was unusual?'''
 
-        a2 = '''Answer:
-        The maps marked a route far north, past the usual shipping lanes, and the journal entries hinted at "treasures of the deep" that could reshape their understanding of the ocean’s depths.
-        '''
+        # a2 = '''Answer:
+        # The maps marked a route far north, past the usual shipping lanes, and the journal entries hinted at "treasures of the deep" that could reshape their understanding of the ocean’s depths.
+        # '''
 
-        q3 = '''Paragraph:
-        Dr. Hargrove’s lectures were known for their peculiar structure. He often began with anecdotes about seemingly unrelated historical events before weaving them into the complex theories of molecular biology he aimed to explain. Students frequently found themselves perplexed at the start, only to experience a moment of clarity when the connections were finally revealed. Still, many struggled to keep up with the leaps in logic, describing his classes as both fascinating and frustrating.
+        # q3 = '''Paragraph:
+        # Dr. Hargrove’s lectures were known for their peculiar structure. He often began with anecdotes about seemingly unrelated historical events before weaving them into the complex theories of molecular biology he aimed to explain. Students frequently found themselves perplexed at the start, only to experience a moment of clarity when the connections were finally revealed. Still, many struggled to keep up with the leaps in logic, describing his classes as both fascinating and frustrating.
 
-        Question:
-        Why were Dr. Hargrove’s lectures considered frustrating by some students?'''
+        # Question:
+        # Why were Dr. Hargrove’s lectures considered frustrating by some students?'''
 
-        a3 = '''Answer:
-        Dr. Hargrove’s lectures were considered frustrating because many students struggled to keep up with the leaps in logic and the delay in understanding how his anecdotes connected to the theories of molecular biology.
-        '''
+        # a3 = '''Answer:
+        # Dr. Hargrove’s lectures were considered frustrating because many students struggled to keep up with the leaps in logic and the delay in understanding how his anecdotes connected to the theories of molecular biology.
+        # '''
 
-        q4 = '''Paragraph:
-        The old clockmaker’s shop, tucked away in a narrow alley, was filled with an assortment of ticking contraptions. Each clock had a story, the clockmaker often said, and none more so than the great pendulum clock that stood in the corner. Its face bore the scars of a fire long extinguished, and its hands moved erratically, as though struggling against the passage of time. Yet, customers were drawn to it, claiming they felt a strange sense of calm whenever they heard its uneven chimes.
+        # q4 = '''Paragraph:
+        # The old clockmaker’s shop, tucked away in a narrow alley, was filled with an assortment of ticking contraptions. Each clock had a story, the clockmaker often said, and none more so than the great pendulum clock that stood in the corner. Its face bore the scars of a fire long extinguished, and its hands moved erratically, as though struggling against the passage of time. Yet, customers were drawn to it, claiming they felt a strange sense of calm whenever they heard its uneven chimes.
 
-        Question:
-        What was unusual about the great pendulum clock in the clockmaker’s shop?'''
+        # Question:
+        # What was unusual about the great pendulum clock in the clockmaker’s shop?'''
 
-        a4 = '''Answer:
-        The great pendulum clock had a scarred face from a fire and its hands moved erratically, as though struggling against the passage of time.
-        '''
+        # a4 = '''Answer:
+        # The great pendulum clock had a scarred face from a fire and its hands moved erratically, as though struggling against the passage of time.
+        # '''
 
-        q5 = '''Paragraph:
-        When the king’s caravan arrived at the gates of Lyonesse, the city’s famed golden spires were shrouded in twilight. The herald’s voice rang out, calling for an audience with the city’s rulers, but no response came. Inside the walls, the streets lay deserted, with only faint whispers carried on the wind. Those who ventured close to the gates later spoke of shadows moving along the parapets, though no one dared to claim they saw the inhabitants themselves.
+        # q5 = '''Paragraph:
+        # When the king’s caravan arrived at the gates of Lyonesse, the city’s famed golden spires were shrouded in twilight. The herald’s voice rang out, calling for an audience with the city’s rulers, but no response came. Inside the walls, the streets lay deserted, with only faint whispers carried on the wind. Those who ventured close to the gates later spoke of shadows moving along the parapets, though no one dared to claim they saw the inhabitants themselves.
 
-        Question:
-        What did people notice about Lyonesse when the king’s caravan arrived?'''
+        # Question:
+        # What did people notice about Lyonesse when the king’s caravan arrived?'''
 
-        a5 = '''Answer:
-        People noticed that the streets of Lyonesse were deserted, and faint whispers were carried on the wind. Some who ventured close to the gates claimed to see shadows moving along the parapets.
-        '''
+        # a5 = '''Answer:
+        # People noticed that the streets of Lyonesse were deserted, and faint whispers were carried on the wind. Some who ventured close to the gates claimed to see shadows moving along the parapets.
+        # '''
 
-        q6 = '''Paragraph:
-        The ancient manuscript contained cryptic symbols that scholars believed to be a form of early celestial mapping. Unlike modern star charts, these maps depicted constellations alongside diagrams of mythical creatures and elaborate geometric patterns. Some researchers theorized that the manuscript was not meant for navigation but for ceremonial purposes, reflecting the belief that the stars held divine significance.
+        # q6 = '''Paragraph:
+        # The ancient manuscript contained cryptic symbols that scholars believed to be a form of early celestial mapping. Unlike modern star charts, these maps depicted constellations alongside diagrams of mythical creatures and elaborate geometric patterns. Some researchers theorized that the manuscript was not meant for navigation but for ceremonial purposes, reflecting the belief that the stars held divine significance.
 
-        Question:
-        What was one theory about the purpose of the ancient manuscript?'''
+        # Question:
+        # What was one theory about the purpose of the ancient manuscript?'''
 
-        a6 = '''Answer:
-        One theory was that the manuscript was intended for ceremonial purposes, reflecting the belief that the stars held divine significance.
-        '''
+        # a6 = '''Answer:
+        # One theory was that the manuscript was intended for ceremonial purposes, reflecting the belief that the stars held divine significance.
+        # '''
 
-        q7 = '''Paragraph:
+        # q7 = '''Paragraph:
+        # {paragraph}
+
+        # Question:
+        # {question}'''
+        prompt = f'''You are a helpful assistant answering questions about a book. Your job is to respond based only on the paragraphs provided. 
+        Do not add information that is not explicitly mentioned or implied.
+
+        Rules:
+        - Use complete sentences.
+        - Keep answers concise and grounded in the paragraph.
+        - Do not assume or speculate beyond the text.
+        
+        Here is your Question:
+        {question}
+        
+        Relevant Paragraphs:
         {paragraph}
 
-        Question:
-        {question}'''
+        Answer:
+        <your answer>
+        '''
     
-
-        prompt_template = ChatPromptTemplate.from_template(q7)
-        messages = prompt_template.format_messages(paragraph=paragraph, question=question)
-        prompt = messages[0].content
-        print('Starting here: ',paragraph, ": Ending here")
-        print(question)
-        print(page)
-        completion = self.client.chat.completions.create(
-        model="mistralai/Mistral-7B-Instruct-v0.2", 
-        messages = [
-        {"role": "system", "content": "You are Mistral. You are a helpful assistant."},
-        {"role": "user", "content": f},
-        {"role": "assistant", "content": "Sure! Please provide the first question."},
-    
-        {"role": "user", "content": q1},
-        {"role": "assistant", "content": a1},
-
-        {"role": "user", "content": q2},
-        {"role": "assistant", "content": a2},
-
-        {"role": "user", "content": q3},
-        {"role": "assistant", "content": a3},
-
-        {"role": "user", "content": q4},
-        {"role": "assistant", "content": a4},
-
-        {"role": "user", "content": q5},
-        {"role": "assistant", "content": a5},
-
-        {"role": "user", "content": q6},
-        {"role": "assistant", "content": a6},
-
-        {"role": "user", "content": prompt},
-                    ])
         
-        return completion.choices[0].message.content.split('Answer:')[-1]
+    
+
+        # prompt_template = ChatPromptTemplate.from_template(q7)
+        # messages = prompt_template.format_messages(paragraph=paragraph, question=question)
+        # prompt = messages[0].content
+        # print('Starting here: ',paragraph, ": Ending here")
+        # print(question)
+        # print(page)
+        # completion = self.client.chat.completions.create(
+        # model="mistralai/Mistral-Small-3.1-24B-Instruct-2503", 
+        # messages = [
+        # {"role": "system", "content": "You are Mistral. You are a helpful assistant."},
+        # {"role": "user", "content": f},
+        # {"role": "assistant", "content": "Sure! Please provide the first question."},
+    
+        # {"role": "user", "content": q1},
+        # {"role": "assistant", "content": a1},
+
+        # {"role": "user", "content": q2},
+        # {"role": "assistant", "content": a2},
+
+        # {"role": "user", "content": q3},
+        # {"role": "assistant", "content": a3},
+
+        # {"role": "user", "content": q4},
+        # {"role": "assistant", "content": a4},
+
+        # {"role": "user", "content": q5},
+        # {"role": "assistant", "content": a5},
+
+        # {"role": "user", "content": q6},
+        # {"role": "assistant", "content": a6},
+
+        # {"role": "user", "content": prompt},
+        #             ]
+        
+        
+        
+        #)
+        
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant, helping answer questions from a book (context)."},
+            {"role": "user", "content":prompt},
+                    ]
+        payload = {
+            "model": "gpt-4o-mini",
+            "messages": messages
+                    }
+        response = requests.post(url, json=payload, headers=headers)
+        output = response.json()['choices'][0]['message']['content']#.split('**Updated character description:**')[-1].strip()
+        return output
+        
+        # prompt_template = ChatPromptTemplate.from_template(q7)
+        # messages = prompt_template.format_messages(paragraph=paragraph, question=question)
+        # prompt = messages[0].content
+        # print('Starting here: ',paragraph, ": Ending here")
+        # print(question)
+        # print(page)
+        # completion = self.client.chat.completions.create(
+        # model="mistralai/Mistral-Small-3.1-24B-Instruct-2503", 
+        
+        # return completion.choices[0].message.content.split('Answer:')[-1]
 
 
 
@@ -294,7 +415,7 @@ class LLMService:
         messages = self.all_messages[ind]
         messages[-1]['content'] = prompt
         completion = self.client.chat.completions.create(
-            model="mistralai/Mistral-7B-Instruct-v0.2", 
+            model="mistralai/Mistral-Small-3.1-24B-Instruct-2503", 
             messages=messages, 
             max_tokens=500, temperature=0.1)
         

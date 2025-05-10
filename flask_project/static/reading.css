@@ -481,6 +481,7 @@ position: relative;
     gap: 15px;
     flex-direction: column;
     background-color: #e0ddd1;
+    /* background: linear-gradient(to bottom, #f6c2b5, #fccfac, #f9d2b7,#f8cdab, #f3c0b3); */
     border-radius: 45px;
     padding: 10px;
     box-shadow: 3px 5px 20px rgba(0, 0, 0, 0.2);
@@ -671,20 +672,6 @@ position: relative;
     justify-content: space-between; 
     gap: 10px;}
 
-.chatbot {
-        background-color: #e0ddd1;
-        color: #cc0000;
-        border-radius: 52px;
-        width: 80px;
-        height: 80px;
-        align-self: center;
-        text-align: center;
-      
-        /* Add this to center text */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
 
 .popup_button_chatbot {
         display: flex;
@@ -692,8 +679,6 @@ position: relative;
         align-items: center;
         justify-content: center;
         line-height: 1.0;
-    
-    
         border: none;
         outline: none;
         font-family: inherit;
@@ -723,6 +708,20 @@ position: relative;
 
 /* POPUP for CHARCATERS */
 
+.characters {
+  background-color: #e0ddd1;
+  color: #cc0000;
+  border-radius: 52px;
+  width: 80px;
+  height: 80px;
+  align-self: center;
+  text-align: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* 
 .popup-overlay {
     position: fixed;
     top: 0; left: 0;
@@ -766,11 +765,133 @@ position: relative;
   
   .hidden {
     display: none;
+  } */
+
+  #openModal {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 5px;
   }
 
+  /* Modal Overlay */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Modal */
+  .modal {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .modal-overlay.active .modal {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .modal img {
+    width: 100%;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  .modal h2 {
+    margin-top: 1rem;
+    font-size: 1.5rem;
+  }
+
+  .modal p {
+    margin: 0.75rem 0;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #888;
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+
+  .modal-footer button {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 1rem;
+  }
+
+  .modal-content {
+    transition: opacity 0.3s ease;
+  }
+  .modal-content h2{
+    color: #000000;
+  }
+
+  .fade-out {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .modal,
+    .modal-overlay,
+    .modal-content {
+      transition: none !important;
+    }
+  }
+  .notification-badge {
+    /* position: absolute; */
+    background: red;
+    color: white;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 15px;
+    text-align: center;
+    line-height: 18px;
+    align-items: center;
+    z-index: 10;
+  }
 
 /* STICKY NOTES */
-
+/* 
 @import url('https://fonts.googleapis.com/css?family=Indie+Flower&display=swap');
 
 
@@ -851,10 +972,309 @@ position: relative;
     }
 
   }
+} */
+/* Overlay for dimming the background */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* semi-transparent */
+  display: none;
+  z-index: 999; /* Behind the sticky note */
+}
+
+/* Sticky note animation for center focus */
+.sticky {
+  position: fixed; /* Position it at the center initially */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centering the note */
+  height: 280px;
+  width: 220px;
+  display: inline-block;
+  margin: 10px;
+  padding: 18px 10px 10px 10px;
+  box-sizing: border-box;
+  box-shadow: 6px 7px 12px -5px rgba(0, 0, 0, 0.75);
+  font-size: 24px;
+  background: #ffd31d;
+  resize: both;
+  overflow: scroll;
+  color: #cc0000;
+  transition: all 0.5s ease-in-out; /* Smooth transition */
+  z-index: 1000; /* Above the overlay */
+  animation: stickAnim .3s ease;
+}
+
+.sticky.hide {
+  transform: translate(-50%, -50%) scale(0.3); /* Shrink the note but not too small */
+  width: 40px; /* Make it a circle with a reasonable size */
+  height: 40px; /* Keep the height and width equal for a circle */
+  border-radius: 50%; /* Make it round */
+  opacity: 1; /* Keep it visible */
+  z-index: 500; /* Lower z-index to make it less "in focus" */
+  transition: all 0.5s ease-out; /* Smooth transition to the small dot */
 }
 
 
 
+.sticky::before {
+  content: "Click here to write your note";
+  display: block;
+  text-align: center;
+  color: #333;
+  font-size: 18px;
+}
+
+.sticky .close {
+  font-size: 26px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  width: 18px;
+}
+
+/* Keyframe for sticky note appearance */
+@keyframes stickAnim {
+  0% {
+    transform: scale(5);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.sticky button.finish-btn {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.sticky button.finish-btn:hover {
+  background-color: #45a049;
+}
+
+
+
+/* CHATBOT SECTION */
+
+
+:root {
+  --port-gore: #dfddd1;
+  --gallery: #f0f0f0;
+  --white: #fff;
+  --riptide: #ffa89b;
+  --gray: #7f7f7f;
+  --athens-gray: #e6eaee;
+  --purple-heart: #d05744;
+  --chat-height: 380px;
+  --chat-max-width: 350px;
+  --chat-distance: 80px;
+  --chat-padding: 10px;
+  --header-height: 30px;
+  --entry-height: 60px;
+  --transition-speed: 0.2s;
+}
+.chatbot {
+  position: fixed;
+  bottom: 0;
+  left: 0;                 /* span from left… */
+  right: 0;
+  margin: 0 auto;  
+  width: 100%;
+  max-width: var(--chat-max-width);
+  background: var(--white);
+  box-shadow: 0 -6px 99px -17px rgba(0, 0, 0, 0.68);
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc(100% - var(--header-height)));
+  transition: transform var(--transition-speed) ease;
+  border-radius: 26px 26px 0 0;
+  z-index: 1000;
+  overflow: hidden;
+}
+.chatbot.chatbot--open {
+  /* transform: translateY(0); */
+  transform: translateY(0);
+}
+
+.chatbot__header {
+  /* background: var(--port-gore); */
+  background: linear-gradient(to right, #ff7e5f, #feb47b, #f9c39f);
+  color: var(--white);
+  height: var(--header-height);
+  padding: 0 var(--chat-padding);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background var(--transition-speed);
+}
+
+.chatbot__header p {
+  color: #35312f;
+  position: absolute;     
+  left: 50%;                
+  transform: translateX(-50%); 
+  margin: 0;
+}
+
+.chatbot__header:hover {
+  /* background: #d05744; */
+  background: linear-gradient(to right, #f6aa97, #f2c8a8, #f6d9c5);
+}
+/* .chatbot__header:hover p {
+  color: #ffffff; 
+} */
+.chatbot.chatbot--open .chatbot__header {
+  background: linear-gradient(to right, #ff7e5f, #feb47b, #f9c39f);
+}
+.chatbot.chatbot--open .chatbot__header p {
+  color: #000000; /* optional: also change the title text color */
+}
+
+.chatbot__close-button {
+  width: 16px;
+  height: 16px;
+  fill: var(--white);
+  cursor: pointer;
+}
+
+.chatbot__message-window {
+  height: 300px; /* or set a fixed px height to test */
+  /* padding: 16px; */
+  background-color: var(--white);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  border-top: 1px solid #ccc;
+}
+.chatbot__messages {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--chat-padding);
+  padding: 0px;
+}
+.chatbot__messages li {
+  display: flex;
+  align-items: flex-start;
+  max-width: 80%;
+  animation: fadein 0.25s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+.chatbot__messages .is-user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.chatbot__arrow {
+  width: 0;
+  height: 0;
+  align-self: flex-start;
+  margin: 0 6px;
+}
+.is-ai .chatbot__arrow {
+  border-right: 6px solid var(--gallery);
+}
+.is-user .chatbot__arrow {
+  border-left: 6px solid var(--riptide);
+}
+
+.chatbot__message {
+  padding: 12px var(--chat-padding);
+  border-radius: 6px;
+  color: #000;
+  line-height: 1.4;
+  word-break: break-word;
+}
+.is-ai .chatbot__message {
+  background: var(--gallery);
+  margin-right: 1.5em;
+}
+.is-user .chatbot__message {
+  background: var(--riptide);
+  margin-left: 1.5em;
+}
+
+.chatbot__entry {
+  display: flex;
+  align-items: center;
+  height: var(--entry-height);
+  border-top: 1px solid var(--athens-gray);
+  padding: 0 var(--chat-padding);
+}
+.chatbot__input {
+  flex: 1;
+  border: 1px solid var(--athens-gray);
+  height: 70%;
+  padding: 0 8px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+.chatbot__input::placeholder {
+  color: var(--gray);
+}
+
+/* make Send button visible */
+.chatbot__submit {
+  margin-left: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  border: 1px solid var(--purple-heart);
+  border-radius: 4px;
+  background: var(--purple-heart);
+  color: var(--white);
+  cursor: pointer;
+  transition: background var(--transition-speed);
+}
+.chatbot__submit:hover {
+  background: #be6e62;
+}
+
+.loader {
+  display: flex;
+  gap: 4px;
+  opacity: 0.5;
+}
+.loader__dot {
+  width: 6px;
+  height: 6px;
+  background: var(--gray);
+  border-radius: 50%;
+  animation: loader 0.45s infinite alternate;
+}
+.loader__dot:nth-of-type(2) {
+  animation-delay: 0.15s;
+}
+.loader__dot:nth-of-type(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes loader {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-5px);
+  }
+}
+@keyframes fadein {
+  from {
+    opacity: 0;
+    margin-top: 10px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 0;
+  }
+}
 
 
 /* Flip effect styles */
@@ -862,4 +1282,3 @@ position: relative;
 
 /* FOR HIGHLITING COLOR OPTIONS */
 
-  

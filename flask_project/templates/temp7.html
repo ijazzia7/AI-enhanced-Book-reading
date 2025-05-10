@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Chatbot</title>
+    <style>
+      :root {
+        --port-gore: #292460;
+        --gallery: #f0f0f0;
+        --white: #fff;
+        --riptide: #7ee0d2;
+        --gray: #7f7f7f;
+        --athens-gray: #e6eaee;
+        --purple-heart: #7226e0;
+        --chat-height: 380px;
+        --chat-max-width: 420px;
+        --chat-distance: 80px;
+        --chat-padding: 20px;
+        --header-height: 54px;
+        --entry-height: 60px;
+        --transition-speed: 0.2s;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Open Sans", sans-serif;
+        background: url("https://images.unsplash.com/photo-1464823063530-08f10ed1a2dd?auto=compress,format&fit=crop&w=1199&h=799&q=80")
+          no-repeat center/cover;
+        height: 100vh;
+      }
+
+      .chatbot {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        max-width: var(--chat-max-width);
+        margin-right: var(--chat-distance);
+        background: var(--white);
+        box-shadow: 0 -6px 99px -17px rgba(0, 0, 0, 0.68);
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        flex-direction: column;
+        transform: translateY(calc(100% - var(--header-height)));
+        transition: transform var(--transition-speed) ease;
+      }
+      .chatbot.chatbot--open {
+        transform: translateY(0);
+      }
+
+      .chatbot__header {
+        background: var(--port-gore);
+        color: var(--white);
+        height: var(--header-height);
+        padding: 0 var(--chat-padding);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: background var(--transition-speed);
+      }
+      .chatbot__header:hover {
+        background: #3a2a7d;
+      }
+      .chatbot__close-button {
+        width: 16px;
+        height: 16px;
+        fill: var(--white);
+        cursor: pointer;
+      }
+
+      .chatbot__message-window {
+        background: var(--white);
+        padding: var(--chat-padding);
+        height: var(--chat-height);
+        overflow-y: auto;
+        flex: 1;
+      }
+      .chatbot__messages {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--chat-padding);
+      }
+      .chatbot__messages li {
+        display: flex;
+        align-items: flex-start;
+        max-width: 80%;
+        animation: fadein 0.25s cubic-bezier(0.55, 0.055, 0.675, 0.19);
+      }
+      .chatbot__messages .is-user {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+      }
+      .chatbot__arrow {
+        width: 0;
+        height: 0;
+        align-self: flex-start;
+        margin: 0 6px;
+      }
+      .is-ai .chatbot__arrow {
+        border-right: 6px solid var(--gallery);
+      }
+      .is-user .chatbot__arrow {
+        border-left: 6px solid var(--riptide);
+      }
+
+      .chatbot__message {
+        padding: 12px var(--chat-padding);
+        border-radius: 6px;
+        line-height: 1.4;
+        word-break: break-word;
+      }
+      .is-ai .chatbot__message {
+        background: var(--gallery);
+        margin-right: 1.5em;
+      }
+      .is-user .chatbot__message {
+        background: var(--riptide);
+        margin-left: 1.5em;
+      }
+
+      .chatbot__entry {
+        display: flex;
+        align-items: center;
+        height: var(--entry-height);
+        border-top: 1px solid var(--athens-gray);
+        padding: 0 var(--chat-padding);
+      }
+      .chatbot__input {
+        flex: 1;
+        border: 1px solid var(--athens-gray);
+        height: 70%;
+        padding: 0 8px;
+        font-size: 14px;
+        border-radius: 4px;
+      }
+      .chatbot__input::placeholder {
+        color: var(--gray);
+      }
+
+      /* make Send button visible */
+      .chatbot__submit {
+        margin-left: 8px;
+        padding: 6px 12px;
+        font-size: 14px;
+        border: 1px solid var(--purple-heart);
+        border-radius: 4px;
+        background: var(--purple-heart);
+        color: var(--white);
+        cursor: pointer;
+        transition: background var(--transition-speed);
+      }
+      .chatbot__submit:hover {
+        background: #5a1bb5;
+      }
+
+      .loader {
+        display: flex;
+        gap: 4px;
+        opacity: 0.5;
+      }
+      .loader__dot {
+        width: 6px;
+        height: 6px;
+        background: var(--gray);
+        border-radius: 50%;
+        animation: loader 0.45s infinite alternate;
+      }
+      .loader__dot:nth-of-type(2) {
+        animation-delay: 0.15s;
+      }
+      .loader__dot:nth-of-type(3) {
+        animation-delay: 0.3s;
+      }
+
+      @keyframes loader {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(-5px);
+        }
+      }
+      @keyframes fadein {
+        from {
+          opacity: 0;
+          margin-top: 10px;
+        }
+        to {
+          opacity: 1;
+          margin-top: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chatbot" id="chatbot">
+      <div class="chatbot__header" id="toggle">
+        <p>Literary Assistant</p>
+        <svg class="chatbot__close-button" viewBox="0 0 24 24">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </div>
+      <div class="chatbot__message-window">
+        <ul class="chatbot__messages" id="messages">
+          <li class="is-ai">
+            <div class="chatbot__arrow"></div>
+            <div class="chatbot__message">
+              Hello, dear reader! 📚 How may I assist you with your next great
+              read?
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="chatbot__entry">
+        <input
+          class="chatbot__input"
+          id="input"
+          placeholder="Ask about a book, author, or quote…"
+        />
+        <button class="chatbot__submit" id="send">Send</button>
+      </div>
+    </div>
+
+    <script>
+      const bot = document.getElementById("chatbot"),
+        toggle = document.getElementById("toggle"),
+        msgs = document.getElementById("messages"),
+        input = document.getElementById("input"),
+        send = document.getElementById("send");
+
+      toggle.addEventListener("click", () =>
+        bot.classList.toggle("chatbot--open")
+      );
+
+      function appendMessage(text, role) {
+        const li = document.createElement("li");
+        li.className = role;
+        const arrow = document.createElement("div");
+        arrow.className = "chatbot__arrow";
+        const msg = document.createElement("div");
+        msg.className = "chatbot__message";
+        msg.textContent = text;
+        li.appendChild(arrow);
+        li.appendChild(msg);
+        msgs.appendChild(li);
+        msgs.parentNode.scrollTop = msgs.parentNode.scrollHeight;
+      }
+
+      function showLoader() {
+        const li = document.createElement("li");
+        li.className = "is-ai";
+        const arrow = document.createElement("div");
+        arrow.className = "chatbot__arrow";
+        const loader = document.createElement("div");
+        loader.className = "loader";
+        for (let i = 0; i < 3; i++) {
+          const dot = document.createElement("div");
+          dot.className = "loader__dot";
+          loader.appendChild(dot);
+        }
+        li.appendChild(arrow);
+        li.appendChild(loader);
+        msgs.appendChild(li);
+        msgs.parentNode.scrollTop = msgs.parentNode.scrollHeight;
+        return li;
+      }
+
+      send.addEventListener("click", () => {
+        const text = input.value.trim();
+        if (!text) return;
+        appendMessage(text, "is-user");
+        input.value = "";
+        const loaderLi = showLoader();
+        setTimeout(() => {
+          loaderLi.remove();
+          let reply = "I'm pondering your question…";
+          if (/recommend/i.test(text))
+            reply =
+              "Sure—what genre or mood are you in? Classics, fantasy, or something new?";
+          else if (/tolkien/i.test(text))
+            reply =
+              "Ah, Middle‑earth! Are you re‑reading The Hobbit or diving into The Lord of the Rings?";
+          appendMessage(reply, "is-ai");
+        }, 1200 + Math.random() * 800);
+      });
+
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") send.click();
+      });
+    </script>
+  </body>
+</html>
