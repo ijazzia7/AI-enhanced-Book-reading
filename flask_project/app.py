@@ -1,54 +1,89 @@
 from flask import Flask, render_template, jsonify, request, send_file
 import pdfplumber
-from llm_service import LLMService, Text2SpeechService, ChatWithBook, Summarization, audio_to_text, Visualization, characterUpdate
+from llm_service import LLMService, Text2SpeechService, ChatWithBook, Summarization, audio_to_text, paraVisualization, characterUpdate, characterVis, paraVisualization
 from langchain.prompts import ChatPromptTemplate
 from flair.data import Sentence
 from flair.models import SequenceTagger
 import numpy as np
 import requests
 import time
+from flask import session, redirect, url_for
+from auth import auth_bp
+from DBmodel import db
+import os
+import json
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import Chroma
+import re
+
 
 app = Flask(__name__)
-#model = LLMService()
-#tts_service = Text2SpeechService()
-model=1
-tts_service=2
 
+app.secret_key = 'your_secret_key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
+app.register_blueprint(auth_bp)
+
+# Create DB only if it doesn't exist
+@app.before_request
+def initialize_database():
+    db_path = os.path.join(os.getcwd(), 'users.db')
+    if not os.path.exists(db_path):
+        with app.app_context():
+            db.create_all()
+
+
+word_comprehension = LLMService()
+tts_service = Text2SpeechService()
 chat_bot = ChatWithBook()
-
 summary = Summarization()
 audio = audio_to_text()
-vis = Visualization()
-summary = 1
-audio = 1
-vis = 1
 updateCharacter = characterUpdate()
+charImageUpdate = characterVis()
+para_visualization = paraVisualization()
 
+def login_required(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            return redirect(url_for('auth.login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 tagger = SequenceTagger.load("flair/ner-english-fast")
 # PDF Book Path and Chunk Size
-BOOK_PATH = "static/books/my_book-10.pdf"
 CHUNK_SIZE = 500  # Number of characters per chunk
 characters_dict={}
 
 # Helper function to load PDF chunks
-def load_pdf_pages():
-    pages = []
+# def load_pdf_pages():
+#     pages = []
     
-    with pdfplumber.open(BOOK_PATH) as pdf:
-        for page in pdf.pages:
-            text = page.extract_text_simple()
-            text = text.replace(' \n ', '<br><br>').replace('\n \n', '<br><br>').replace('_', '').replace('-­‐', '-')
+#     with pdfplumber.open(BOOK_PATH) as pdf:
+#         for page in pdf.pages:
+#             text = page.extract_text_simple()
+#             text = text.replace(' \n ', '<br><br>').replace('\n \n', '<br><br>').replace('_', '').replace('-­‐', '-')
 
-            pages.append(text if text else "Page is empty")  # Handle empty pages
+#             pages.append(text if text else "Page is empty")  # Handle empty pages
             
-    return pages
+#     return pages
+def load_pdf_pages():    
+    with open(BOOK_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+
+
 
 # Global variable to store pages
-book_pages = load_pdf_pages()
+#book_pages = load_pdf_pages()
 
 @app.route('/') 
+@login_required
 def index():
     return render_template('homepage.html')
 
@@ -71,19 +106,30 @@ def get_page(page_num):
         page_1 = book_pages[page_num]
         page_2 = book_pages[page_num+1]
         
+        
         if '#$#$' in page_1:
             new_chap = 'one'
             chap_name = page_1.split('#$#$')[1]
-            page_1 = '<br><br>'.join(page_1.split('#$#$')[2].split('<br><br>')[1:])
+            if '<br><br>' in page_1:
+                page_1 = '<br><br>'.join(page_1.split('#$#$')[2].split('<br><br>')[1:])
+            else:
+                page_1 = page_1.split('#$#$')[2].strip()
+#            page_1 = '<br><br>'.join(page_1.split('#$#$')[2].split('<br><br>')[1:])
         elif '#$#$' in page_2:
             new_chap = 'two'
             chap_name = page_2.split('#$#$')[1]
-            page_2 = '<br><br>'.join(page_2.split('#$#$')[2].split('<br><br>')[1:])
+            if '<br><br>' in page_2:
+                page_2 = '<br><br>'.join(page_2.split('#$#$')[2].split('<br><br>')[1:])
+            else:
+                page_2 = page_2.split('#$#$')[2].strip()
+            #page_2 = '<br><br>'.join(page_2.split('#$#$')[2].split('<br><br>')[1:])
         else:
             new_chap='none'
             chap_name='none'
-
-        return jsonify({'page1': page_1,'page2': page_2,'chap': new_chap,'chapterName':chap_name, 'next_page': page_num + 2, 'prev_page': page_num - 2, 'characters':characters})
+        current_chapter = int(combined_book_text[:combined_book_text.index(page_1)].split('#$#$')[-2].split()[-1])-1
+        
+                
+        return jsonify({'page1': page_1,'page2': page_2,'chap': new_chap,'chapterName':chap_name, 'next_page': page_num + 2, 'prev_page': page_num - 2, 'characters':characters, 'currentChap':current_chapter})
     return jsonify({'page': '', 'next_page': None, 'prev_page': None})  # End of book
 
 
@@ -100,7 +146,28 @@ def get_page(page_num):
 
 @app.route('/book-link') 
 def reading_page():
-    return render_template('reading.html')
+    global book_file, BOOK_PATH, book_pages, vector_db, combined_book_text, chapters
+    
+    book_file = request.args.get('book')
+    BOOK_PATH = f"cache/{book_file}"
+    book_pages = load_pdf_pages()
+    combined_book_text = ' '.join(book_pages)
+    chapters = re.split(r'#\$\#\$Chapter \d+\#\$\#\$', combined_book_text)[1:]
+    hf_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    persist_dir = f'static/vectordb/{book_file.split(".")[0]}/chroma'
+    vector_db = Chroma(
+    persist_directory=persist_dir,
+    embedding_function=hf_embeddings)
+    pattern = r"#\$\#\$Chapter \d+\#\$\#\$"
+    chapter_pages=[]
+    for i in range(len(book_pages)):
+        if re.search(pattern, book_pages[i]):
+            chapter_pages.append(i+1)
+    print(book_file, BOOK_PATH,persist_dir)
+    
+    #return render_template('reading.html')
+    return render_template('reading.html', totalPages=len(book_pages), chapterStarts=chapter_pages)
+
 
 def characters_to_display(characters_dict):
     l = list(characters_dict.values())
@@ -121,14 +188,10 @@ def characters_to_display(characters_dict):
 @app.route('/simple_meaning', methods=['POST'])  
 def simple_meaning():
     data = request.get_json()
-    selected_text = data.get('selected_text', '')
-    if selected_text:
-        prompt  = 'Word: "{word}"'
-        prompt_template = ChatPromptTemplate.from_template(prompt)
-        messages = prompt_template.format_messages(word=selected_text)
-        final_prompt = messages[0].content
-        #output = model.generate_response(final_prompt, 0)
-        output = 'Lorem ipsum this'
+    word = data.get('selected_text', '')
+    if word:
+        output = word_comprehension.generate_response(word, 0, paragraph='None')
+        #output = 'Lorem ipsum this is a testing MEANING of the word. This should be replaced by the model output'
         return jsonify({"LLM_output": output}), 200
     return jsonify({"error": "No text received."}), 400
 
@@ -136,15 +199,11 @@ def simple_meaning():
 @app.route('/contextual_meaning', methods=['POST'])  
 def contextual_meaning():
     data = request.get_json()
-    selected_text = data.get('selected_text')
+    word = data.get('selected_text')
     paragraph = data.get('selected_paragraph')
-    if selected_text:
-        prompt = '''Word: "{word}"\nParagraph: {paragraph}'''
-        prompt_template = ChatPromptTemplate.from_template(prompt)
-        messages = prompt_template.format_messages(word=selected_text, paragraph=paragraph)
-        final_prompt = messages[0].content
-        #output = model.generate_response(final_prompt, 1)
-        output = 'Lorem ipsum this is a testing meaning of the word. This should be replaced by the model output'
+    if word:
+        output = word_comprehension.generate_response(word, 1, paragraph=paragraph)
+        #output = 'Lorem ipsum this is a testing CONTEXTUAL MEANING of the word. This should be replaced by the model output'
         return jsonify({"LLM_output": output}), 200
     return jsonify({"error": "No text received."}), 400
 
@@ -153,14 +212,10 @@ def contextual_meaning():
 @app.route('/create_sentence', methods=['POST'])  
 def create_sentence():
     data = request.get_json()
-    selected_text = data.get('selected_text', '')
-    if selected_text:
-        prompt  = 'Word: "{word}"'
-        prompt_template = ChatPromptTemplate.from_template(prompt)
-        messages = prompt_template.format_messages(word=selected_text)
-        final_prompt = messages[0].content
-        #output = model.generate_response(final_prompt, 2)
-        output = 'Lorem ipsum this is a testing meaning of the word. This should be replaced by the model output'
+    word = data.get('selected_text', '')
+    if word:
+        output = word_comprehension.generate_response(word, 2, paragraph='None')
+        #output = 'Lorem ipsum this is a testing SENTENCE of the word. This should be replaced by the model output'
         return jsonify({"LLM_output": output}), 200
     return jsonify({"error": "No text received."}), 400
 
@@ -191,20 +246,8 @@ def chatting():
     question = data.get('question')
     page_num = data.get('page_number')
     if question:
-        output = chat_bot.chat(question, page_num)
+        output = chat_bot.chat(question, page_num, vector_db)
         #output = 'Hello how can we help you? This is a dummy response. #A dummy response'
-        return jsonify({"chat_reply": output}), 200
-    return jsonify({"error": "No text received."}), 400
-
-#------------------------------------------------------------------------------------------------
-
-@app.route('/summarize', methods=['POST'])  
-def summary():
-    data = request.get_json()
-    question = data.get('question')
-    if question:
-        #output = chat_bot.chat(question, page_num)
-        output = 'Hello how can we help you? This is a dummy response. A dummy response'
         return jsonify({"chat_reply": output}), 200
     return jsonify({"error": "No text received."}), 400
 
@@ -230,10 +273,10 @@ def transcribe_audio():
 #------------------------------------------------------------------------------------------------
 
     
-@app.route('/get-image', methods=['POST'])
-def get_image():
-    img_base64 = vis.get_images()
-    return jsonify({"image": f"data:image/png;base64,{img_base64}"})
+# @app.route('/get-image', methods=['POST'])
+# def get_image():
+#     img_base64 = vis.get_images()
+#     return jsonify({"image": f"data:image/png;base64,{img_base64}"})
 
 
 
@@ -260,7 +303,6 @@ def get_word_definition():
         t = t.rstrip()       
     else:
         print(f"Error: {response.status_code}")
-        print(response.text)
         return jsonify({"error": "No text received."}), 400
     
     return jsonify({"def": t}), 200
@@ -274,13 +316,12 @@ def update_description():
     char = data.get("char")
     p1 = data.get("p1")
     p2 = data.get("p2")
-    print(char)
+    index = data.get("index")
     
 
-    #output = updateCharacter.generate_response(current_desc, char, p1, p2)
-    time.sleep(7) 
-    output = f'{char} Dummy Output character description For character'
-    print(output)
+    output = updateCharacter.generate_response(current_desc, char, p1, p2, vector_db)
+    #time.sleep(7) 
+    #output = f'{char}{index} Dummy Output character description For character'
     
     return jsonify({"output": output})  
 
@@ -289,6 +330,53 @@ def update_description():
 #------------------------------------------------------------------------------------------------
 
 
+# Visualize Character 
+@app.route('/visCharacter', methods=['POST'])  
+def update_image():
+    data = request.get_json() 
+    char = data.get("char")
+    p1 = data.get("p1")
+    p2 = data.get("p2")
+    index = data.get("index")
+    
+    
+    #output = f'https://dummyimage.com/504x504/cccccc/000000&text={char}{index}'
+    output = charImageUpdate.generate_response(char, p1, p2, vector_db)
+    #time.sleep(7) 
+    
+    return jsonify({"output_path": output})  
+
+
+
+#------------------------------------------------------------------------------------------------
+
+
+# Paragraph Visualization 
+@app.route('/visParagraph', methods=['POST'])  
+def character_vis():
+    data = request.get_json() 
+    paragraph = data.get("paragraph")
+    output_path = para_visualization.get_images(paragraph)
+    #time.sleep(7) 
+    #output = f'{char} Dummy Output character description For character'
+    
+    return jsonify({"output_path": output_path})  
+
+#------------------------------------------------------------------------------------------------
+
+
+# Chapter Summarization 
+@app.route('/summarize', methods=['POST'])  
+def summarizingChapter():
+    chap_num = request.get_json() 
+    chapter_content = chapters[chap_num]
+    result = summary.summarize(chapter_content)
+    return jsonify({"summarized_chapter": result})  
+
+#------------------------------------------------------------------------------------------------
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
+ 

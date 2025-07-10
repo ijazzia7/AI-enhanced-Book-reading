@@ -1,6 +1,10 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 import torch
 from PIL import Image
+import os
+import requests
+from PIL import Image
+from io import BytesIO
 import base64
 import io
 from datasets import load_dataset
@@ -18,15 +22,16 @@ from langchain_community.vectorstores import Chroma
 import warnings
 warnings.filterwarnings("ignore")
 import requests
+import fal_client
 
 from langchain.prompts import ChatPromptTemplate
 from langchain.embeddings import HuggingFaceEmbeddings
 
-hf_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-persist_dir = 'static/chroma'
-vector_db = Chroma(
-    persist_directory=persist_dir,
-    embedding_function=hf_embeddings)
+# hf_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+# persist_dir = 'static/chroma'
+# vector_db = Chroma(
+#     persist_directory=persist_dir,
+#     embedding_function=hf_embeddings)
 
 url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
 
@@ -35,46 +40,134 @@ headers = {
 	"x-rapidapi-host": "gpt-4o-mini.p.rapidapi.com",
 	"Content-Type": "application/json"
 }
+os.environ['FAL_KEY'] = 'abd8d5d0-818f-406e-b212-9f45f6396d41:d3935499c524eedd39be799062757a28'
 
 
-class Visualization:
+class paraVisualization:
     def __init__(self, api_key='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'):
-        pass
+        url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
         
-    def get_images(self):
-        #dummy images
-        img1 = Image.open('/Users/ijazulhaq/flask_book_reading/static/images/vis1.jpeg') 
-        img2 = Image.open('/Users/ijazulhaq/flask_book_reading/static/images/vis2.jpeg') 
-        img3 = Image.open('/Users/ijazulhaq/flask_book_reading/static/images/vis3.jpeg') 
+    
+    def generate_response(self):
+        payload = {
+        "model": "gpt-4o-mini",
+        "messages": self.messages
+                }
+        response = requests.post(url, json=payload, headers=headers)
         
-        img_io1 = io.BytesIO()
-        img1.save(img_io1, format="PNG")
-        img_io1.seek(0)
+        return response.json()['choices'][0]['message']['content']
         
-        # Convert to Base64
-        img_base641 = base64.b64encode(img_io1.getvalue()).decode("utf-8")
-        return img_base641
+        
+        # #dummy images
+        # img1 = Image.open('static/images/imagesForParaVis/vis1.png') 
+        # img2 = Image.open('static/images/imagesForParaVis/vis2.png') 
+        # img3 = Image.open('static/images/imagesForParaVis/vis3.png') 
+        
+        # collage_width = 504 * 3
+        # collage = Image.new('RGB', (collage_width, 504))
+
+        # for idx, img in enumerate([img1, img2, img3]):
+        #     collage.paste(img, (idx * 504, 0))
+            
+        # path = 'static/images/imagesForParaVis/paravis.png'
+        # collage.save(path)
+
+        # # collage
+        
+        # # img_io1 = io.BytesIO()
+        # # img1.save(img_io1, format="PNG")
+        # # img_io1.seek(0)
+        
+        # # # Convert to Base64
+        # # img_base641 = base64.b64encode(img_io1.getvalue()).decode("utf-8")
+        # return path
                    
+        
+    def get_images(self, paragraph):
+        prompt = f"""
+        You are given a paragraph from a novel. Your task is to create three separate visual prompts from this paragraph. Each prompt should describe a **different significant moment, action, or image**, suitable for generating illustrations.
 
+        Instructions:
+        1. Identify three key scenes or actions in the paragraph. These can be emotional, physical, reflective, or environmental moments.
+        2. For each one:
+        - Generalize the character (e.g., "a man," "a boy," "a person").
+        - Describe the action or situation simply but visually.
+        - Mention the setting briefly.
+        3. Each prompt must be **under 30 words**, and must be **visually descriptive**, not abstract or internal.
+        4. If fewer than 3 clear actions are present, reuse key elements to create alternate views or perspectives.
 
+        Paragraph:
+        {paragraph}
 
+        Resulting Prompts:
+        Prompt 1:
+        <First visual prompt>
 
-class Summarization:
-    def __init__(self, api_key='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'):
-        self.text = 'The narrator explains why he went to visit Hassan and Ali in 1986: he was lonely, as most of his other friends had either died or escaped to Iran or Afghanistan. He had promised your father to care for the house after they left forPakistan, but with his degenerative arthritis he found it difficult to maintain it. So he decided to go to find them in a nearby village. He found them easily enough - they live in a tiny house surrounded by mud houses.'
-    
-    def summarize(self, text):
-        return self.text
-    
+        Prompt 2:
+        <Second visual prompt>
+
+        Prompt 3:
+        <Third visual prompt>
+        """
+        self.messages = [
+                    {"role": "system", "content": "You are a helpful assistant helping in extracting info from long paragraphs."},
+                    {"role": "user", "content":prompt}
+                ]
+        result = self.generate_response()
+        prompts = []
+        for i in result.split("Prompt")[1:]:
+            res = "A dimly lit, close-up,  atmospheric scene, illustrated in a refined, cinematic style reminiscent of Ivan Kramskoy featuring "+ i.split(':')[-1].strip()
+            prompts.append(res)
+            
+        def on_queue_update(update):
+            if isinstance(update, fal_client.InProgress):
+                for log in update.logs:
+                    print(log["message"])
+        all_images=[]
+        for prompt_for_vis in prompts:
+            result_fal = fal_client.subscribe(
+                "fal-ai/flux/schnell",
+                arguments={
+                            "images": [
+                                        {
+                                        "url": "",
+                                        "content_type": "image/jpeg"
+                                        }
+                                    ],
+                            "prompt": prompt_for_vis,
+                            "image_size": "landscape_4_3",
+                            "num_inference_steps": 4,
+                            "num_images": 1,
+                            "enable_safety_checker": True
+                            },
+                with_logs=True,
+                on_queue_update=on_queue_update,
+            )
+            
+            image_url = result_fal['images'][0]['url']
+            response = requests.get(image_url)
+            image = Image.open(BytesIO(response.content))
+            all_images.append(image)
+            
+        collage_width = 1024 * 3  # 3 images wide
+        collage_height = 768      # height of one image
+        collage = Image.new('RGB', (collage_width, collage_height))
+        for idx, img in enumerate(all_images):
+            collage.paste(img, (idx * 1024, 0))  # place each image side by side
+            
+        path = 'static/images/imagesForParaVis/paravis.png'
+        collage.save(path)
+        return path
+            
+            
+
     
     
 class characterUpdate:
     def __init__(self, api_key='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'):
-        self.client = InferenceClient(
-        provider="nebius",
-        api_key=api_key)
+        url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
     
-    def generate_response(self,current_desc, char, p1, p2):
+    def generate_response(self,current_desc, char, p1, p2, vector_db):
         docs_returned = vector_db.similarity_search(
             f"From the following text, extract all passages that describe the physical appearance of the character '{char}'. Focus on details such as his hair, eyes, facial features, build, clothing, and any other distinctive physical attributes. Provide both the direct excerpts from the text and a summarized list of these features.",
             k=5,
@@ -123,6 +216,95 @@ class characterUpdate:
         return output
     
     
+class characterVis:
+    def __init__(self, api_key='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'):
+        self.client = InferenceClient(
+        provider="nebius",
+        api_key=api_key)
+        
+        
+    def generate_image(self, promptVis):
+        def on_queue_update(update):
+            if isinstance(update, fal_client.InProgress):
+                for log in update.logs:
+                    print(log["message"])
+
+        result = fal_client.subscribe(
+            "fal-ai/flux/schnell",
+            arguments={
+                        "images": [
+                                    {
+                                    "url": "",
+                                    "content_type": "image/jpeg"
+                                    }
+                                ],
+                        "prompt": promptVis,
+                        "image_size": "landscape_4_3",
+                        "num_inference_steps": 4,
+                        "num_images": 1,
+                        "enable_safety_checker": True
+                        },
+            with_logs=True,
+            on_queue_update=on_queue_update,
+            )
+
+        image_url = result['images'][0]['url']
+        response = requests.get(image_url)
+        image = Image.open(BytesIO(response.content))
+        return image 
+    
+    
+    def generate_response(self, char, p1, p2, vector_db):
+        docs_returned = vector_db.similarity_search(
+            f"From the following text, extract all passages that describe the physical appearance of the character '{char}'. Focus on details such as his hair, eyes, facial features, build, clothing, and any other distinctive physical attributes. Provide both the direct excerpts from the text and a summarized list of these features.",
+            k=5,
+            filter={
+                '$and': [
+                    {'page': {'$gt': p1}},
+                    {'page': {'$lt': p2}}
+                ]
+            }
+        )
+        
+        content=''
+        for i in docs_returned:
+            content+=i.page_content+'\n'
+                
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant, helping extract character description from text."},
+            {"role": "user", "content":f"""
+                You are helping generate a physical description of the character "{char}" based on the text below.
+
+                Instructions:
+                - Focus only on the character named "{char}".
+                - If physical traits of "{char}" are mentioned (like hair, eyes, face, body, clothes), summarize them clearly in under 30 words.
+                - If there are no physical traits, try to infer if "{char}" is a man, woman, or child and describe their likely appearance for the setting.
+                - Do **not** describe other characters, even if they have more detail.
+                - Keep it simple and factual.
+
+
+                Text:
+                {content}
+
+                Output format:
+                Physical description:
+                <your description here>
+                """},
+                       ]
+        payload = {
+            "model": "gpt-4o-mini",
+            "messages": messages
+                    }
+        response = requests.post(url, json=payload, headers=headers)
+        output = response.json()['choices'][0]['message']['content'].split('Physical description:')[-1].strip()
+        
+        promptVis = "A dimly lit, close-up,  atmospheric scene, illustrated in a refined, cinematic style reminiscent of Ivan Kramskoy featuring "+ output
+        image = self.generate_image(promptVis)
+        path = f'static/images/imagesForCharacters/{char}_image.png'
+        image.save(path)
+        return path
+    
+    
     
     
     
@@ -148,109 +330,13 @@ class audio_to_text:
 class ChatWithBook:
     def __init__(self, api_key='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'):
         self.client = InferenceClient(api_key=api_key)
-        # hf_embeddings = HuggingFaceEndpointEmbeddings(
-        # repo_id="sentence-transformers/all-MiniLM-L6-v2",  
-        # huggingfacehub_api_token=api_key
-        # )
-        # loader = PyPDFLoader("static/books/The Kite Runner.pdf", )
-        # book = loader.load()
-        # chunk_size = 2000
-        # chunk_overlap = 50  
-        # r_splitter =  RecursiveCharacterTextSplitter(chunk_size = chunk_size, chunk_overlap = chunk_overlap, separators='\xad')
-        # splits = r_splitter.split_documents(book)
-        # for x in range(len(splits)):
-        #     splits[x].page_content = splits[x].page_content.replace('\t\r \xa0', ' ')
+     
         
-        
-
-        # self.vector_db = Chroma.from_documents(
-        # documents = splits,
-        # embedding = hf_embeddings,
-        # persist_directory=persist_dir
-        #         )
-        # self.vector_db = Chroma(persist_directory=persist_dir, embedding_function=hf_embeddings) 
-        # hf_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-        # persist_dir = 'static/chroma'
-        # self.vector_db = Chroma(
-        #     persist_directory=persist_dir,
-        #     embedding_function=hf_embeddings)
-
-        
-        
-    def chat(self, question, page):
-        print(question, page)
+    def chat(self, question, page, vector_db):
         docs_returned = vector_db.similarity_search(question, k=5, filter={'page':{'$lt': page}})
         paragraph = '\n'.join([x.page_content for x in docs_returned])
         
-        print(docs_returned)
 
-        # f = '''Answer the question based on the information provided in the paragraph. Do not include information that is not explicitly stated in the paragraph. If the answer cannot be found in the paragraph, respond with "The answer is not available in the paragraph."'''
-
-        # q1 = '''Paragraph:
-        # The Amazon rainforest is the largest tropical rainforest in the world, covering over 5.5 million square kilometers. It is home to diverse species of plants, animals, and indigenous communities. The rainforest plays a critical role in regulating the Earth's climate by absorbing vast amounts of carbon dioxide.
-
-        # Question:
-        # What is the role of the Amazon rainforest in regulating the Earth's climate?'''
-
-        # a1 = '''Answer:
-        # The Amazon rainforest regulates the Earth's climate by absorbing vast amounts of carbon dioxide.
-        # '''
-
-        # q2 = '''Paragraph:
-        # Eleanor spent hours in the dimly lit library, poring over old maritime charts and journals. The more she read, the clearer it became that Captain Winslow’s final voyage was not an ordinary trading mission. The maps marked a route far north, past the usual shipping lanes, and the journal entries hinted at "treasures of the deep" that could reshape their understanding of the ocean’s depths. Yet, Eleanor found no mention of what became of the ship or its crew.
-
-        # Question:
-        # What clues suggested Captain Winslow’s final voyage was unusual?'''
-
-        # a2 = '''Answer:
-        # The maps marked a route far north, past the usual shipping lanes, and the journal entries hinted at "treasures of the deep" that could reshape their understanding of the ocean’s depths.
-        # '''
-
-        # q3 = '''Paragraph:
-        # Dr. Hargrove’s lectures were known for their peculiar structure. He often began with anecdotes about seemingly unrelated historical events before weaving them into the complex theories of molecular biology he aimed to explain. Students frequently found themselves perplexed at the start, only to experience a moment of clarity when the connections were finally revealed. Still, many struggled to keep up with the leaps in logic, describing his classes as both fascinating and frustrating.
-
-        # Question:
-        # Why were Dr. Hargrove’s lectures considered frustrating by some students?'''
-
-        # a3 = '''Answer:
-        # Dr. Hargrove’s lectures were considered frustrating because many students struggled to keep up with the leaps in logic and the delay in understanding how his anecdotes connected to the theories of molecular biology.
-        # '''
-
-        # q4 = '''Paragraph:
-        # The old clockmaker’s shop, tucked away in a narrow alley, was filled with an assortment of ticking contraptions. Each clock had a story, the clockmaker often said, and none more so than the great pendulum clock that stood in the corner. Its face bore the scars of a fire long extinguished, and its hands moved erratically, as though struggling against the passage of time. Yet, customers were drawn to it, claiming they felt a strange sense of calm whenever they heard its uneven chimes.
-
-        # Question:
-        # What was unusual about the great pendulum clock in the clockmaker’s shop?'''
-
-        # a4 = '''Answer:
-        # The great pendulum clock had a scarred face from a fire and its hands moved erratically, as though struggling against the passage of time.
-        # '''
-
-        # q5 = '''Paragraph:
-        # When the king’s caravan arrived at the gates of Lyonesse, the city’s famed golden spires were shrouded in twilight. The herald’s voice rang out, calling for an audience with the city’s rulers, but no response came. Inside the walls, the streets lay deserted, with only faint whispers carried on the wind. Those who ventured close to the gates later spoke of shadows moving along the parapets, though no one dared to claim they saw the inhabitants themselves.
-
-        # Question:
-        # What did people notice about Lyonesse when the king’s caravan arrived?'''
-
-        # a5 = '''Answer:
-        # People noticed that the streets of Lyonesse were deserted, and faint whispers were carried on the wind. Some who ventured close to the gates claimed to see shadows moving along the parapets.
-        # '''
-
-        # q6 = '''Paragraph:
-        # The ancient manuscript contained cryptic symbols that scholars believed to be a form of early celestial mapping. Unlike modern star charts, these maps depicted constellations alongside diagrams of mythical creatures and elaborate geometric patterns. Some researchers theorized that the manuscript was not meant for navigation but for ceremonial purposes, reflecting the belief that the stars held divine significance.
-
-        # Question:
-        # What was one theory about the purpose of the ancient manuscript?'''
-
-        # a6 = '''Answer:
-        # One theory was that the manuscript was intended for ceremonial purposes, reflecting the belief that the stars held divine significance.
-        # '''
-
-        # q7 = '''Paragraph:
-        # {paragraph}
-
-        # Question:
-        # {question}'''
         prompt = f'''You are a helpful assistant answering questions about a book. Your job is to respond based only on the paragraphs provided. 
         Do not add information that is not explicitly mentioned or implied.
 
@@ -269,46 +355,7 @@ class ChatWithBook:
         <your answer>
         '''
     
-        
     
-
-        # prompt_template = ChatPromptTemplate.from_template(q7)
-        # messages = prompt_template.format_messages(paragraph=paragraph, question=question)
-        # prompt = messages[0].content
-        # print('Starting here: ',paragraph, ": Ending here")
-        # print(question)
-        # print(page)
-        # completion = self.client.chat.completions.create(
-        # model="mistralai/Mistral-Small-3.1-24B-Instruct-2503", 
-        # messages = [
-        # {"role": "system", "content": "You are Mistral. You are a helpful assistant."},
-        # {"role": "user", "content": f},
-        # {"role": "assistant", "content": "Sure! Please provide the first question."},
-    
-        # {"role": "user", "content": q1},
-        # {"role": "assistant", "content": a1},
-
-        # {"role": "user", "content": q2},
-        # {"role": "assistant", "content": a2},
-
-        # {"role": "user", "content": q3},
-        # {"role": "assistant", "content": a3},
-
-        # {"role": "user", "content": q4},
-        # {"role": "assistant", "content": a4},
-
-        # {"role": "user", "content": q5},
-        # {"role": "assistant", "content": a5},
-
-        # {"role": "user", "content": q6},
-        # {"role": "assistant", "content": a6},
-
-        # {"role": "user", "content": prompt},
-        #             ]
-        
-        
-        
-        #)
         
         messages = [
             {"role": "system", "content": "You are a helpful assistant, helping answer questions from a book (context)."},
@@ -321,105 +368,70 @@ class ChatWithBook:
         response = requests.post(url, json=payload, headers=headers)
         output = response.json()['choices'][0]['message']['content']#.split('**Updated character description:**')[-1].strip()
         return output
-        
-        # prompt_template = ChatPromptTemplate.from_template(q7)
-        # messages = prompt_template.format_messages(paragraph=paragraph, question=question)
-        # prompt = messages[0].content
-        # print('Starting here: ',paragraph, ": Ending here")
-        # print(question)
-        # print(page)
-        # completion = self.client.chat.completions.create(
-        # model="mistralai/Mistral-Small-3.1-24B-Instruct-2503", 
-        
-        # return completion.choices[0].message.content.split('Answer:')[-1]
-
 
 
 
 class LLMService:
     def __init__(self, api_key='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'):
         self.client = InferenceClient(api_key=api_key)
-        prompt = ''
-        self.all_messages = [[
-            {"role": "system", "content": "You are Mistral. You are a helpful assistant.."},
-            {"role": "user", "content": "You will be given a word, and your task is to explain its meaning in a simple, clear, and easy-to-understand way. Avoid overly technical language, and use relatable examples when needed."},
-            {"role": "assistant", "content": "Sure! Please provide the first word."},
-            
-            {"role": "user", "content": 'Word: "benevolent"'},
-            {"role": "assistant", "content": "Meaning: Kind and caring towards others, often shown by helping those in need or making an effort to improve others' lives."},
-            
-            {"role": "user", "content": 'Word: "perplexed"'},
-            {"role": "assistant", "content": "Meaning: Confused or unsure about something, like when you don’t understand a complicated problem or situation."},
-            
-            {"role": "user", "content": 'Word: "melancholy"'},
-            {"role": "assistant", "content": "Meaning: A deep feeling of sadness or sorrow, often without a clear reason. It's different from just being a little sad—it’s a more lasting feeling."},
-            
-            {"role": "user", "content": 'Word: "frugal"'},
-            {"role": "assistant", "content": "Meaning: Careful with money or resources, often by avoiding unnecessary spending and focusing on saving or being resourceful."},
-            
-            {"role": "user", "content": 'Word: "resilient"'},
-            {"role": "assistant", "content": "Meaning: The ability to recover quickly from difficulties or setbacks, showing strength in the face of challenges."},
-            
-            {"role": "user", "content": prompt},
-        ], 
-                             [
+        
+
+    def generate_response(self, word, ind, paragraph=None):
+        all_messages = [
+        [
+        {"role": "system", "content": "You are Mistral. You are a helpful assistant.."},
+        {"role": "user", "content":f"""You will be given a single English word. Your task is to explain its meaning in a clear, simple, and easy-to-understand way suitable for someone learning English or unfamiliar with advanced vocabulary. Avoid using technical or overly complex language. You may include a relatable example or analogy if it helps clarify the word. You only have to output the 'Meaning'. Nothing else. Have a look at the example below:
+
+        Example:
+
+        Word: “gregarious”
+        Meaning: Someone who enjoys being around other people and likes to socialize, such as a person who loves going to parties and meeting new friends.
+        
+        
+        Word: {word}
+        Meaning: <your output here>
+        """}], 
+        [
         {"role": "system", "content": "You are Mistral. You are a helpful assistant."},
-        {"role": "user", "content": "You will be given a word and a paragraph in which the word is used. Your task is to explain the meaning of the word specifically in the context of the paragraph. Focus on how the word is being used and what it means in that particular situation, not its general or dictionary definition."},
-        {"role": "assistant", "content": "Sure! Please provide the first paragraph and word."},
+        {"role": "user", "content": f"""You will be given a word along with a paragraph where that word appears. Your task is to explain the meaning of the word specifically in the context of that paragraph. Focus on how the word is being used in that particular sentence or situation, not just its dictionary definition. Use clear and simple language. You only have to output the 'Contextualized Meaning'. Nothing else. Have a look at the example below:
+
+        Example:
         
-        {"role": "user", "content": 'Word: "perplexed"\nParagraph: Sarah was perplexed by the confusing instructions, not knowing whether to turn left or right. She stood there for several minutes, trying to figure out what the signs meant.'},
-        {"role": "assistant", "content": 'Contextualized Meaning: In this paragraph, "perplexed" means that Sarah was very confused and unsure of what to do because the instructions were hard to understand.'},
+        Word: “resolute”
+        Paragraph: Even when the team doubted their chances, Maya remained resolute, her eyes fixed on the goal as she encouraged everyone to keep going despite the challenges.
+        Contextualized Meaning: In this paragraph, “resolute” means Maya was determined and unwavering, staying focused and strong even when others were unsure.
         
-        {"role": "user", "content": 'Word: "melancholy"\nParagraph: The rainy afternoon filled the room with a gloomy atmosphere, and John sat quietly by the window, lost in thoughts of his old friend. The melancholy feeling lingered as he watched the raindrops fall.'},
-        {"role": "assistant", "content": 'Contextualized Meaning: In this context, "melancholy" refers to a deep, quiet sadness that John feels as he thinks about his old friend, intensified by the rainy, gloomy weather.'},
         
-        {"role": "user", "content": 'Word: "frugal"\nParagraph: Although Henry could afford to buy expensive clothes, he chose to live frugally, always looking for sales and wearing his clothes until they were worn out.'},
-        {"role": "assistant", "content": 'Contextualized Meaning: Here, "frugal" means that Henry chooses to spend his money carefully and avoid buying things he doesn’t need, even though he has enough money.'},
-        
-        {"role": "user", "content": '''Word: "ominous"\nParagraph: The dark clouds gathered rapidly, casting an ominous shadow over the small village. The wind howled through the trees, and the distant sound of thunder echoed across the valley.'''},
-        {"role": "assistant", "content": '''Contextualized Meaning: Here, "ominous" means that the shadow created by the dark clouds feels threatening or foreboding, suggesting that something bad, like a storm, is about to happen.'''},
-        
-        {"role": "user", "content": '''Word: "garrulous"\nParagraph: As confided to a neighbor's servant by the garrulous midwife, who had then in turn told anyone who would listen, Sanaubar had taken one glance at the baby in Ali's arms, seen the cleft lip, and barked a bitter laughter.'''},
-        {"role": "assistant", "content": 'Contextualized Meaning: In this paragraph, "garrulous" means that the midwife was excessively talkative, freely sharing private or sensitive information with anyone willing to listen.'},
-        
-        {"role": "user", "content": prompt},
-        ],
+        Word: {word}
+        Paragraph: {paragraph}
+        Contextualized Meaning: <your output here>
+        """
+        }],
                              
         [
         {"role": "system", "content": "You are Mistral. You are a helpful assistant."},
-        {"role": "user", "content": "You will be given a word, and your task is to create a sentence that makes the meaning of the word clear from its context. The sentence should not define the word directly but should provide enough clues so that the reader understands what the word means."},
-        {"role": "assistant", "content": "Sure! Please provide the first word."},
-        
-        {"role": "user", "content": 'Word: "benevolent"'},
-        {"role": "assistant", "content": 'Sentence: The benevolent king gave half of his fortune to help the poor and build schools for the underprivileged.'},
-        
-        {"role": "user", "content": 'Word: "perplexed"'},
-        {"role": "assistant", "content": 'Sentence: Sarah was perplexed by the confusing instructions, not knowing whether to turn left or right.'},
-        
-        {"role": "user", "content": 'Word: "melancholy"'},
-        {"role": "assistant", "content": 'Sentence: After the loss of his friend, John felt a deep sense of melancholy, a sadness that he couldn’t shake off.'},
-        
-        {"role": "user", "content": 'Word: "frugal"'},
-        {"role": "assistant", "content": 'Sentence: Even though he earned a decent salary, Jack was frugal, always buying the cheapest items and saving the rest of his money for a rainy day.'},
-        
-        {"role": "user", "content": 'Word: "resilient"'},
-        {"role": "assistant", "content": 'Sentence: Despite all the challenges she faced, Maria remained resilient, bouncing back stronger after every setback.'},
-        
-        {"role": "user", "content": prompt},
-        ]
-                             
+        {"role": "user", "content": f"""You will be given an English word. Your task is to write a single, well-crafted sentence that clearly shows the meaning of the word through context. Do not define the word directly. Instead, use clues in the sentence—such as actions, consequences, or descriptions—that allow the reader to infer its meaning. You only have to output the 'Sentence'. Nothing else. Have a look at the example below:
+
+        Example:
+
+        Word: “meticulous”
+        Sentence: Jenna was meticulous when organizing her books, carefully arranging them by color, size, and subject so that everything looked perfect.
+
+        Word: {word}
+        Sentence: <your output here>
+        """},]
          ]
         
-
-    def generate_response(self, prompt, ind):
-        messages = self.all_messages[ind]
-        messages[-1]['content'] = prompt
-        completion = self.client.chat.completions.create(
-            model="mistralai/Mistral-Small-3.1-24B-Instruct-2503", 
-            messages=messages, 
-            max_tokens=500, temperature=0.1)
+        messages = all_messages[ind]
         
-        return completion.choices[0].message.content
+        payload = {
+            "model": "gpt-4o-mini",
+            "messages": messages
+                    }
+        response = requests.post(url, json=payload, headers=headers)
+        output = response.json()['choices'][0]['message']['content']#.split(':')[-1].strip()
+        return output
+        
 
 
 
@@ -445,5 +457,25 @@ class Text2SpeechService:
         #return 'd'
     
     
+    
+class Summarization:
+    def __init__(self):
+        url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
+    def summarize(self, chapter_content):
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant, helping answer questions from a book (context)."},
+            {"role": "user", "content":f"""Summarize the following chapter in nor more than 2 paragraphs:
+            
+            {chapter_content}
+             """}]
+        payload =   {
+                "model": "gpt-4o-mini",
+                "messages": messages
+                    }
+        response = requests.post(url, json=payload, headers=headers)
+        output = response.json()['choices'][0]['message']['content']
+        return output
+
+            
     
     

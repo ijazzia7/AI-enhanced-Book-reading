@@ -1,0 +1,84 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap");
+
+body {
+  font-family: "Open Sans", sans-serif;
+  background: #e9edf5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.auth-container {
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 460px;
+  text-align: center;
+}
+
+.auth-container h2 {
+  color: #2948ff;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-form input {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+  transition: border-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.auth-form input:focus {
+  border-color: #2948ff;
+  background: #ffffff;
+  outline: none;
+}
+
+.auth-form button {
+  background: #2948ff;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.auth-form button:hover {
+  background: #1f36d0;
+}
+
+.auth-links {
+  margin-top: 1.25rem;
+  font-size: 0.95rem;
+}
+
+.auth-links a {
+  color: #2948ff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}
+
+.auth-error {
+  color: red;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}

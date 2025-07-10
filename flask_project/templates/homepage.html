@@ -41,8 +41,14 @@
           </div>
 
           <div class="user-profile">
-            <img src="static/images/user.png" alt="User Profile" />
-            <span>Username</span>
+            <img
+              src="{{ url_for('static', filename='images/user.png') }}"
+              alt="User Profile"
+            />
+            <span>{{ session.get('username', 'Guest') }}</span>
+            <a href="{{ url_for('auth.logout') }}" class="logout-button"
+              >Logout</a
+            >
           </div>
         </div>
 
@@ -56,7 +62,7 @@
               </div>
 
               <div class="books-row">
-                <a href="/book-link" class="book-link">
+                <a href="/book-link?book=thekiterunner.json" class="book-link">
                   <div class="book-card">
                     <img
                       class="book_images"
@@ -64,11 +70,14 @@
                       alt="Book 1"
                     />
                     <div class="book-title">The Kite Runner</div>
-                    <div class="book-author">Fyodor Dostoevsky</div>
+                    <div class="book-author">Khaled Husseni</div>
                   </div>
                 </a>
 
-                <a href="/book-link" class="book-link">
+                <a
+                  href="/book-link?book=crimeandpunishment.json"
+                  class="book-link"
+                >
                   <div class="book-card">
                     <img
                       class="book_images"
@@ -80,7 +89,7 @@
                   </div>
                 </a>
 
-                <a href="/book-link" class="book-link">
+                <a href="/book-link?book=animalfarm.json" class="book-link">
                   <div class="book-card">
                     <img
                       class="book_images"
@@ -88,7 +97,7 @@
                       alt="Book 3"
                     />
                     <div class="book-title">Animal Farm</div>
-                    <div class="book-author">Fyodor Dostoevsky</div>
+                    <div class="book-author">George Orwell</div>
                   </div>
                 </a>
 
@@ -100,7 +109,7 @@
                       alt="Book 4"
                     />
                     <div class="book-title">To Kill A Mocking Bird</div>
-                    <div class="book-author">Fyodor Dostoevsky</div>
+                    <div class="book-author">Harper Lee</div>
                   </div>
                 </a>
 

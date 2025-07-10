@@ -31,22 +31,31 @@ const imgEl = modal.querySelector("#modalImg");
 const contentEl = modal.querySelector(".modal-content");
 let setTo=false;
 let newDescriptions = {};
+let newImages = {};
 let knownCharacters = new Set();
+let iinnddeexxI = 0;
+let iinnddeexxD = 0;
+
+const audioPlayer = document.getElementById("audio-player");
 
 
 
 
 let currentPage = 0;
+let current_chapter = null;
 function loadPage(pageNum) {
     fetch(`/get_page/${pageNum}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.page1) {
+          console.log(data.page1);
           bookContentEl1.innerHTML = `<p>${data.page1}</p>`;
           bookContentEl2.innerHTML = `<p>${data.page2}</p>`;
           on_page = data.chap;
           chapter_title = data.chapterName;
           characters_list = data.characters;
+          current_chapter = data.currentChap;
+
           if (on_page!='none'){
           display_title(on_page, chapter_title)
         }
@@ -60,7 +69,8 @@ function loadPage(pageNum) {
           for (let word in highlightedWordsRed) {
             highlightAllOccurrences(word, highlightedWordsRed[word], true);
           }
-          console.log(characters_list);
+          loadAnnotationForCurrentPage();
+
           // CHECK IF A NEW CHARACTER IS FOUND
 
           let newFound = false;
@@ -85,39 +95,101 @@ function loadPage(pageNum) {
 
           else
           {
-            if (data.next_page%10 == 0) 
+            if (data.next_page%16 == 0) 
             {
               p2 = data.next_page
-              p1 = p2 - 10
+              p1 = p2 - 16
               const updateAllDescriptions = async () =>
               {
                   for (let i = 0; i < characters_list_updated.length; i++) {
                   let char = characters_list_updated[i]['name'];
                   let currentDesc = characters_list_updated[i]['description'];
+                  //output = await updateCharacterDescription(currentDesc, char, p1, p2, iinnddeexxD)
                   output = await updateCharacterDescription(currentDesc, char, p1, p2)
                   newDescriptions[char] = output;
+                  console.log('Description: ',output);
+                  package = buildOrUpdateCharacters({
+                    names: characters_list,
+                    existingCharacters: characters_list_updated,
+                    descriptions: newDescriptions,
+                    images: newImages,
+                    update: true
+                  });   
+                  characters_list_updated = package['characterList']
+                  newDescriptions = package['descriptionsAll']
                 };
                               
-                package = buildOrUpdateCharacters({
-                  names: characters_list,
-                  existingCharacters: characters_list_updated,
-                  descriptions: newDescriptions,
-                  update: true
-                });   
-                characters_list_updated = package['characterList']
-                newDescriptions = package['descriptionsAll']
+                // package = buildOrUpdateCharacters({
+                //   names: characters_list,
+                //   existingCharacters: characters_list_updated,
+                //   descriptions: newDescriptions,
+                //   images: newImages,
+                //   update: true
+                // });   
+                // characters_list_updated = package['characterList']
+                // newDescriptions = package['descriptionsAll']
               }
               updateAllDescriptions();
+              setTo=false;
             }   
              
             else
             {
-              package = buildOrUpdateCharacters({ names: characters_list, descriptions: newDescriptions});
+              package = buildOrUpdateCharacters({ names: characters_list, descriptions: newDescriptions, images: newImages});
               characters_list_updated = package['characterList']
               newDescriptions = package['descriptionsAll']
               setTo=false;
               
             }
+            // FOR IMAGE UPDATION
+            if (data.next_page%20 == 0) 
+            {
+              //iinnddeexxI =iinnddeexxI+1;
+              p2 = data.next_page
+              p1 = p2 - 20
+              const updateAllImages = async () =>
+              {
+                console.log('latest testing',characters_list_updated);
+
+                for (let i = 0; i < characters_list_updated.length; i++) 
+                {
+                  let char = characters_list_updated[i]['name'];
+                  //output = await updateCharacterImages(char, p1, p2, iinnddeexxI)
+                  output = await updateCharacterImages(char, p1, p2)
+                  newImages[char] = output;
+                  console.log('Images: ',output);
+                  console.log('latest testing',characters_list_updated);
+                  package = buildOrUpdateCharacters({
+                    names: characters_list,
+                    existingCharacters: characters_list_updated,
+                    descriptions: newDescriptions,
+                    images: newImages,
+                    update: true
+                  });   
+                  characters_list_updated = package['characterList']
+                  newImages = package['imagesAll']
+
+
+                };
+                              
+                // package = buildOrUpdateCharacters({
+                //   names: characters_list,
+                //   existingCharacters: characters_list_updated,
+                //   descriptions: newDescriptions,
+                //   images: newImages,
+                //   update: true
+                // });   
+                // characters_list_updated = package['characterList']
+                // newImages = package['imagesAll']
+              }
+              updateAllImages();
+              setTo=false;
+            }
+
+
+
+
+
           }
 
           document.getElementById("charactersButton").addEventListener("click", () => openModal(0, setTo));
@@ -170,7 +242,7 @@ function loadPage(pageNum) {
 
 
 
-
+  console.log(currentPage)
   loadPage(currentPage);
   nextButton.addEventListener("click", () => {
     currentPage += 2;
@@ -198,6 +270,7 @@ function loadPage(pageNum) {
       { selected_text: selectedText },
       "Simple Meaning"
     );
+
   });
 
   document.getElementById("contextual-meaning")
@@ -207,6 +280,7 @@ function loadPage(pageNum) {
         { selected_text: selectedText, selected_paragraph: selectedParagraph },
         "Context Meaning"
       );
+
     });
 
   document.getElementById("create-sentence").addEventListener("click", () => {
@@ -215,6 +289,7 @@ function loadPage(pageNum) {
       { selected_text: selectedText },
       "Sentence"
     );
+
   });
 
   document.getElementById("generate-audio").addEventListener("click", () => {
@@ -222,15 +297,15 @@ function loadPage(pageNum) {
   });
 
 
-document.getElementById("vis-para").addEventListener("click", () => {
-  fetch("/get-image", { method: "POST" })
-    .then(response => response.json())
-    .then(data => {
-      appendVis(data)
-    })
-    .catch(error => console.error("Error:", error));
+// document.getElementById("vis-para").addEventListener("click", () => {
+//   fetch("/get-image", { method: "POST" })
+//     .then(response => response.json())
+//     .then(data => {
+//       appendVis(data)
+//     })
+//     .catch(error => console.error("Error:", error));
   
-  });
+//   });
 
 
 
@@ -270,9 +345,19 @@ document.getElementById("vis-para").addEventListener("click", () => {
 
 
 // function to use popup buttons
+
+function updateTooltipMeaning(word, newMeaning, useRed) {
+  const className = useRed ? "highlighted-word-red" : "highlighted-word";
+  const allSpans = document.querySelectorAll(`span.${className}`);
+  allSpans.forEach((span) => {
+    if (span.textContent.toLowerCase() === word.toLowerCase()) {
+      span.setAttribute("data-meaning", newMeaning);
+    }
+  });
+}
   
   function handlePopupAction(url, payload, resultTitle) {
-    st = selectedText
+    st = selectedText;
     if (!st) return;
     fetch(url, {
       method: "POST",
@@ -282,10 +367,22 @@ document.getElementById("vis-para").addEventListener("click", () => {
       .then((response) => response.json())
       .then((data) => {
         // appendInsight(resultTitle, data.LLM_output);
-        highlightedWordsBlue[st.toLowerCase()] = data.LLM_output;
+        //highlightedWordsBlue[st.toLowerCase()] = data.LLM_output;
+        const key = st.toLowerCase();
+
+        if (highlightedWordsBlue.hasOwnProperty(key)) {
+          console.log('got it');
+          const new_output = highlightedWordsBlue[key] + '<br><br>' + data.LLM_output;
+          highlightedWordsBlue[key] = new_output;
+          highlightAllOccurrences(st, new_output, false);
+          updateTooltipMeaning(st, highlightedWordsBlue[st.toLowerCase()], false);
+        }
+        else {highlightedWordsBlue[key] = data.LLM_output;}
         highlightAllOccurrences(st, data.LLM_output, false);
+        updateTooltipMeaning(st, highlightedWordsBlue[st.toLowerCase()], false);
       })
       .catch((error) => console.error("Popup Action Error:", error));
+      selectedText="";
   }
 
 
@@ -645,6 +742,9 @@ addBtn.addEventListener("click", () => {
 
   let stickyCont = document.querySelector(".sticky-container");
   let stickySingle = document.createElement("div");
+  stickySingle.addEventListener("focus", () => {
+    stickySingle.classList.add("active");
+  });
   stickySingle.classList.add("sticky");
 
   stickySingle.contentEditable = "true";
@@ -673,7 +773,7 @@ addBtn.addEventListener("click", () => {
   let angle = randomNumber(-3, 3);
   stickySingle.style.transform = "rotate(" + angle + "deg)";
 
-  let color = randomNumber(1, 720);
+  let color = randomNumber(1, 820);
   stickySingle.style.filter = "hue-rotate(" + color + "deg)";
 
   // Add a Finish button to stop editing and move the note
@@ -684,9 +784,13 @@ addBtn.addEventListener("click", () => {
   stickySingle.appendChild(finishBtn);
   // When the user clicks Finish, hide the overlay and shrink the sticky note
   finishBtn.addEventListener("click", () => {
-    stickySingle.classList.add("hide"); // Shrink the sticky note into a circle
-    overlay.style.display = "none"; // Hide the overlay
-    makeDraggable(stickySingle); // Enable drag functionality on the dot
+    stickySingle.classList.add("hide");
+    overlay.style.display = "none";
+    finishBtn.style.display = "none"; // Hide the button
+    makeDraggable(stickySingle);
+  });
+  stickySingle.addEventListener("input", () => {
+    finishBtn.style.display = "inline-block"; // Show the button again
   });
 
   // Listen for focus to remove overlay and center the sticky note
@@ -798,7 +902,7 @@ function buildOrUpdateCharacters({
   
   // Process each name
   for (const name of names) {
-    const image = images[name] || `https://dummyimage.com/500x250/cccccc/000000&text=${encodeURIComponent(name)}`
+    const image = images[name] || `static/images/imagesForCharacters/defaultImage.png`
     const description = descriptions[name] || `${name} is a character whose story is yet to be written.`;
 
     if (update && charactersMap[name]) {
@@ -819,9 +923,13 @@ function buildOrUpdateCharacters({
   for (const char of characterList) {
     descriptionsAll[char.name] = char.description;
   }
+  const imagesAll = {};
+  for (const char of characterList) {
+    imagesAll[char.name] = char.image;
+  }
 
   // Return updated character list
-  return { characterList, descriptionsAll };
+  return { characterList, descriptionsAll, imagesAll };
 }
 
 
@@ -859,7 +967,7 @@ function updateContent() {
   descEl.textContent = char.description;
 }
 function updateContentForNone() {
-  imgEl.src = 'https://dummyimage.com/500x250/cccccc/000000&text=No+Characters';
+  imgEl.src = 'static/images/imagesForCharacters/noCharacters.png';
   imgEl.alt = "No characters found yet ";
   titleEl.textContent = 'No major characters found yet';
   descEl.textContent = 'No character data available at this time.';
@@ -935,24 +1043,66 @@ async function updateCharacterDescription(currentDesc, char, p1, p2) {
   }
 }
 
-// const openBtn = document.getElementById('charactersButton');
-// const closeBtn = document.getElementById('closePopup');
-// const overlay2 = document.getElementById('popupOverlay');
 
-// openBtn.addEventListener('click', () => {
-//   const popupTitle = overlay2.querySelector('h2');
-//   const popupMessage = overlay2.querySelector('p');
-//   popupTitle.textContent = 'DUMMY TITLE';
-//   // popupMessage.textContent = 'DUMMY MESSAGE THIS NOTHING ELSE DONT LOOK FOR SOMETHING ELSE';
-//   popupMessage.textContent = characters_list;
-//   overlay2.classList.remove('hidden');
-//   requestAnimationFrame(() => overlay2.classList.add('show'));
-// });
 
-// closeBtn.addEventListener('click', () => {
-//   overlay2.classList.remove('show');
-//   setTimeout(() => overlay2.classList.add('hidden'), 400); // Match the CSS transition duration
-// });
+// UPDATE CHARACTERS IMAGES FUNCTION
+async function updateCharacterImages(char, p1, p2) {
+  try {
+      const response = await fetch('/visCharacter', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+              char: char,
+              p1: p1,
+              p2: p2
+          })
+      });
+
+      const data = await response.json();
+      return data.output_path;
+  } catch (error) {
+      console.error('Error updating character Images:', error);
+  }
+}
+
+
+const modalOverlay2 = document.getElementById("modalOverlay-2");
+const modalImage2 = document.getElementById("modalImg-2");
+
+async function sendParagraphAndShowImage() {
+  const paragraph = selectedText;
+  console.log(paragraph);
+
+  try {
+    const response = await fetch('/visParagraph', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paragraph: paragraph })
+    });
+
+    const data = await response.json();
+    modalImage2.src = data.output_path;
+    modalOverlay2.classList.add("active");
+    document.body.style.overflow = "hidden";
+  } catch (error) {
+    console.error('Error fetching image:', error);
+  }
+  selectedText="";
+}
+
+function closeImageModal2() {
+  modalOverlay2.classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+
+document.getElementById("vis-para").addEventListener("click", () => {
+  console.log('yes working');
+  sendParagraphAndShowImage();
+});
+
 
 
 
@@ -1038,7 +1188,314 @@ if (e.key === "Enter") send.click();
  
  
 
+ // AUDIO SECTION
+
+ // Handles audio generation for the selected text.
+ function handleAudioGeneration() {
+  if (!selectedText) {
+    alert("Please highlight some text first!");
+    return;
+  }
+  fetch("/generate_audio", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: selectedText }),
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Error generating audio");
+      return response.blob();
+    })
+    .then((blob) => {
+      const audioUrl = URL.createObjectURL(blob);
+      audioPlayer.src = audioUrl;
+      audioPlayer.style.display = "block";
+      audioPlayer.play();
+    })
+    .catch((error) => console.error("Audio Error:", error));
+}
 
 
   // ANNOTATION SECTION ---------------------------------
+const canvasLeft = document.getElementById("canvas-left");
+const canvasRight = document.getElementById("canvas-right");
+const ctxLeft = canvasLeft.getContext("2d");
+const ctxRight = canvasRight.getContext("2d");
+const leftPage = document.getElementById("book-content-1");
+const rightPage = document.getElementById("book-content-2");
+const annotateBtn = document.getElementById("annotateBtn");
 
+let isDrawing = false;
+let annotating = false;
+let activeCanvas = null;
+let activeCtx = null;
+
+function positionAndResizeCanvas(canvas, targetElement) {
+  const rect = targetElement.getBoundingClientRect();
+
+  // Use getBoundingClientRect for dimensions
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+
+  // Position using offsetTop/offsetLeft + scroll
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+  const top = targetElement.offsetTop;
+  const left = targetElement.offsetLeft;
+
+  canvas.style.position = "absolute";
+  canvas.style.top = (top + scrollTop) + "px";
+  canvas.style.left = (left + scrollLeft) + "px";
+  canvas.style.width = rect.width + "px";
+  canvas.style.height = rect.height + "px";
+}
+
+function updateCanvases() {
+  positionAndResizeCanvas(canvasLeft, leftPage);
+  positionAndResizeCanvas(canvasRight, rightPage);
+}
+
+// Hook into annotate toggle
+annotateBtn.addEventListener("click", () => {
+  annotating = !annotating;
+  annotateBtn.classList.toggle("active", annotating);
+  const mode = annotating ? "auto" : "none";
+  canvasLeft.style.pointerEvents = mode;
+  canvasRight.style.pointerEvents = mode;
+});
+
+// Drawing logic (shared)
+function setupCanvasDrawing(canvas, ctx) {
+  canvas.addEventListener("mousedown", (e) => {
+    if (!annotating) return;
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    activeCanvas = canvas;
+    activeCtx = ctx;
+  });
+
+  canvas.addEventListener("mousemove", (e) => {
+    if (!isDrawing || !annotating || !activeCtx) return;
+    const rect = activeCanvas.getBoundingClientRect();
+    activeCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    activeCtx.strokeStyle = "#ff0000";
+    activeCtx.lineWidth = 2;
+    activeCtx.lineCap = "round";
+    activeCtx.stroke();
+  });
+
+  canvas.addEventListener("mouseup", () => {
+    isDrawing = false
+    saveAnnotationForCurrentPage(canvas.id === "canvas-left" ? "left" : "right");});
+
+    function saveAnnotationForCurrentPage(canvasId) {
+      const pageNumber = canvasId === "left"
+        ? document.getElementById("page-number-1").textContent.trim()
+        : document.getElementById("page-number-2").textContent.trim();
+    
+      const key = `annotation_${canvasId}_${pageNumber}`;
+      const dataURL = canvas.toDataURL("image/png");
+      localStorage.setItem(key, dataURL);
+    }
+  canvas.addEventListener("mouseleave", () => isDrawing = false);
+}
+function loadAnnotationForCurrentPage() {
+  const page1 = document.getElementById("page-number-1").textContent.trim();
+  const page2 = document.getElementById("page-number-2").textContent.trim();
+
+  // Left page
+  const keyLeft = `annotation_left_${page1}`;
+  const savedLeft = localStorage.getItem(keyLeft);
+  if (savedLeft) {
+    const img = new Image();
+    img.onload = () => {
+      ctxLeft.clearRect(0, 0, canvasLeft.width, canvasLeft.height);
+      ctxLeft.drawImage(img, 0, 0);
+    };
+    img.src = savedLeft;
+  } else {
+    ctxLeft.clearRect(0, 0, canvasLeft.width, canvasLeft.height);
+  }
+
+  // Right page
+  const keyRight = `annotation_right_${page2}`;
+  const savedRight = localStorage.getItem(keyRight);
+  if (savedRight) {
+    const img = new Image();
+    img.onload = () => {
+      ctxRight.clearRect(0, 0, canvasRight.width, canvasRight.height);
+      ctxRight.drawImage(img, 0, 0);
+    };
+    img.src = savedRight;
+  } else {
+    ctxRight.clearRect(0, 0, canvasRight.width, canvasRight.height);
+  }
+}
+setupCanvasDrawing(canvasLeft, ctxLeft);
+setupCanvasDrawing(canvasRight, ctxRight);
+
+// Initial + reactive resize
+window.addEventListener("resize", updateCanvases);
+window.addEventListener("scroll", updateCanvases);
+window.addEventListener("load", () => {
+  setTimeout(updateCanvases, 300); // wait for text to load
+});
+
+// Also observe if text is injected dynamically
+const observer = new MutationObserver(updateCanvases);
+observer.observe(leftPage, { childList: true, subtree: true });
+observer.observe(rightPage, { childList: true, subtree: true });
+
+
+  // Voixe COmmand
+
+const recordButton = document.getElementById("record_send");
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let prevTranscription = "";
+
+// Create a recording indicator element and append it to the input container
+const recordIndicator = document.createElement("span");
+recordIndicator.id = "recording-indicator";
+recordIndicator.textContent = "Recording...";
+recordIndicator.style.display = "none"; // initially hidden
+recordIndicator.style.marginLeft = "10px"; // adjust styling as needed
+document.getElementById("input").appendChild(recordIndicator);
+
+recordButton.addEventListener("click", () => {
+  if (!isRecording) {
+    // Start recording
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];       // reset the accumulated audio
+        prevTranscription = ""; // reset previous transcription
+        
+        mediaRecorder.addEventListener("dataavailable", event => {
+          if (event.data.size > 0) {
+            // Accumulate chunks over time
+            audioChunks.push(event.data);
+            // Create a blob of all recorded audio so far
+            const accumulatedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            const formData = new FormData();
+            formData.append("audio", accumulatedBlob, "accumulated.wav");
+
+            // Send the accumulated audio for transcription
+            fetch("/transcribe_audio", {
+              method: "POST",
+              body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.transcription) {
+                const fullTranscription = data.transcription;
+                // Compute the new text (if the transcription is cumulative)
+                let newPart = "";
+                if (fullTranscription.startsWith(prevTranscription)) {
+                  newPart = fullTranscription.substring(prevTranscription.length);
+                } else {
+                  // Fallback: replace previous transcription entirely
+                  newPart = fullTranscription;
+                }
+                prevTranscription = fullTranscription;
+                // Update the chat input with the cumulative transcription
+                document.getElementById("input").value = fullTranscription;
+              } else if (data.error) {
+                console.error("Transcription error:", data.error);
+              }
+            })
+            .catch(error => console.error("Error:", error));
+          }
+        });
+
+        mediaRecorder.addEventListener("start", () => {
+          recordIndicator.style.display = "inline";
+          recordButton.textContent = "Stop";
+          recordButton.style.color = 'white'
+          isRecording = true;
+        });
+
+        mediaRecorder.addEventListener("stop", () => {
+          recordIndicator.style.display = "none";
+          recordButton.textContent = "Voice";
+          isRecording = false;
+        });
+
+        // Start recording, requesting a new data chunk every 2000ms
+        mediaRecorder.start(2000);
+        console.log("Recording started...");
+      })
+      .catch(error => console.error("Microphone error:", error));
+  } else {
+    // Stop recording when the button is clicked again
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+      mediaRecorder.stop();
+      console.log("Recording stopped.");
+    }
+  }
+});
+
+
+
+
+
+
+document.getElementById("summarizeButton").addEventListener("click", () => summarizeFunction());
+document.getElementById("closeSummaryPopup").addEventListener("click", () => {
+  document.getElementById("summaryPopup").style.display = "none";
+});
+
+function summarizeFunction() {
+
+  if (current_chapter==null) return;
+  console.log('sssdssdewes')
+  fetch('/summarize', {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(current_chapter),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      const generated_summary = data.summarized_chapter;
+      console.log(generated_summary);
+      document.getElementById("summaryText").innerText = generated_summary;
+      document.getElementById("chapSumTitle").innerText = `Chapter ${current_chapter+1} Summary`;
+      document.getElementById("summaryPopup").style.display = "flex";
+    })
+    .catch((error) => console.error("Popup Action Error:", error));
+}
+
+
+
+// PROGRESS BAR
+
+// const totalPages = window.BOOK_DATA.totalPages; // or your total page count
+// const chapterStarts = window.BOOK_DATA.chapterStarts; // page numbers where chapters start
+
+// function updateProgress(currentPage) {
+//   const percent = (currentPage / totalPages) * 100;
+//   document.getElementById("progressFill").style.width = `${percent}%`;
+// }
+
+// function renderChapterDots() {
+//   const markerContainer = document.getElementById("chapterMarkers");
+//   markerContainer.innerHTML = "";
+
+//   chapterStarts.forEach(pageNum => {
+//     const dot = document.createElement("div");
+//     dot.className = "chapterDot";
+//     dot.style.left = `${(pageNum / totalPages) * 100}%`;
+//     dot.title = `Chapter starting at page ${pageNum}`;
+//     dot.addEventListener("click", () => {
+//       loadPage(pageNum); // your actual function
+//       updateProgress(pageNum);
+//     });
+//     markerContainer.appendChild(dot);
+//   });
+// }
+
+// // Call once initially
+// renderChapterDots();
+// updateProgress(currentPage);

@@ -29,6 +29,10 @@ main{
     /* margin-left: auto;
     margin-right: auto; */
     max-width: 63em;
+    display: inline;
+    justify-content:space-between;
+    gap: 0px;
+    
 
 }
 
@@ -395,7 +399,7 @@ main{
     max-width: 100%;
     box-sizing: border-box;
     min-height: 600px;
-
+    position: relative;
 
 }
 
@@ -533,7 +537,20 @@ position: relative;
 
 .highlighted-text {
    background: linear-gradient(to bottom, rgba(255,134,9,0.7) 0%,rgba(255,177,34,0.36) 60%,rgba(255,177,34,0.8) 100%);
-   border-radius: 7px;
+   border-radius: 2px;
+}
+
+
+
+.annotation-canvas {
+  position: absolute;
+  z-index: 1000;
+  /* background-color: rgba(0, 255, 0, 0.1); light green for testing */
+  pointer-events: none; /* enable drawing only when needed */
+}
+#annotateBtn.active {
+  background-color: #ffebcc;
+  border: 2px solid #ff9900;
 }
 
 
@@ -705,6 +722,32 @@ position: relative;
 
 }
 
+/* SUMMARIZE BUTTON*/
+.summarize {
+  background-color: #e0ddd1;
+  color: #cc0000;
+  border-radius: 52px;
+  width: 80px;
+  height: 80px;
+  align-self: center;
+  text-align: center;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button_icon_summ{
+  width: 80px;  /* Adjust size */
+  height:80px;  /* Adjust size */
+  border: 0px;
+}
+.summarize img{
+  width:82px;
+  height:82px;
+
+}
+
 
 /* POPUP for CHARCATERS */
 
@@ -721,51 +764,7 @@ position: relative;
   justify-content: center;
   align-items: center;
 }
-/* 
-.popup-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-    z-index: 9999;
-  }
-  
-  .popup-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  
-  .popup-content {
-    background: #fff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    transform: scale(0.8);
-    transition: transform 0.4s ease;
-    max-width: 600px;
-    width: 90%;
-    color: #333;
-    font-family:'Crimson Text', sans-serif;
-  }
-   .popup-content h2{
-    font-size: 20px;
-    font-weight: 'Bold';
-  }
-  
-  .popup-overlay.show .popup-content {
-    transform: scale(1);
-  }
-  
-  .hidden {
-    display: none;
-  } */
+
 
   #openModal {
     padding: 0.75rem 1.5rem;
@@ -889,6 +888,52 @@ position: relative;
     align-items: center;
     z-index: 10;
   }
+
+
+/* Modal Overlay For paraVisualization */
+
+.modal-overlay-2 {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 999;
+}
+.modal-overlay-2.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-2 {
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 100%;
+  width:1000px;
+  position: relative;
+}
+.modal-content-2 img {
+  width: 100%;
+  border-radius: 6px;
+}
+.modal-close-2 {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: #888;
+}
+
+
+
+
 
 /* STICKY NOTES */
 /* 
@@ -1026,6 +1071,9 @@ position: relative;
   text-align: center;
   color: #333;
   font-size: 18px;
+}
+.sticky.active::before {
+  display: none;
 }
 
 .sticky .close {
@@ -1237,6 +1285,22 @@ position: relative;
 .chatbot__submit:hover {
   background: #be6e62;
 }
+.chatbot__record {
+  margin-left: 3px;
+  margin-right: 5px;
+
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid var(--purple-heart);
+  border-radius: 4px;
+  background: var(--purple-heart);
+  color: var(--white);
+  cursor: pointer;
+  transition: background var(--transition-speed);
+}
+.chatbot__record:hover {
+  background: #be6e62;
+}
 
 .loader {
   display: flex;
@@ -1277,8 +1341,119 @@ position: relative;
 }
 
 
-/* Flip effect styles */
+/* popip for summary*/
+#summaryPopup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* backdrop */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+#summaryPopup{
+  color: #000;
+  align-self: center;
+}
+#saveSummary{
+  width: auto;
+  color: #007bff;
+}
 
+.popup-content {
+  background: white;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
-/* FOR HIGHLITING COLOR OPTIONS */
+.summary-scroll {
+  overflow-y: auto;
+  max-height: 60vh;
+  padding-right: 10px;
+  white-space: pre-wrap;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #333;
+}
 
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #666;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* Progress bar */
+
+/* 
+#progressWrapper {
+  width: 90%;
+  margin: 0px;
+  padding: 0px;
+}
+
+#progressTrack {
+  position: relative;
+  height: 16px;
+  background: linear-gradient(145deg, #e8e8e8, #ffffff);
+  border-radius: 999px;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.1), inset -2px -2px 6px rgba(255,255,255,0.6);
+  overflow: hidden;
+  margin: 0;
+}
+
+#progressFill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  transition: width 0.4s ease;
+  border-radius: inherit;
+}
+
+#chapterMarkers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.chapterDot {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background-color: white;
+  border: 3px solid #fc8625;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.chapterDot:hover {
+  transform: translate(-50%, -50%) scale(1.3);
+  background-color: #2575fc;
+} */

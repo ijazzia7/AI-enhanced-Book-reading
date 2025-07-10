@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+      console.log('wefewrf')
+      window.BOOK_DATA = {
+        totalPages: {{ totalPages }},
+        chapterStarts: {{ chapterStarts }}
+      };
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Live Book Reader</title>
@@ -34,6 +41,8 @@
           <button id="closePopup">Close</button>
         </div>
       </div> -->
+      <audio id="audio-player" controls style="display: none"></audio>
+
       <!-- Modal -->
       <div class="modal-overlay" id="modalOverlay">
         <div
@@ -59,6 +68,27 @@
           </div>
         </div>
       </div>
+      <!-- Summary Popup 
+      <div id="summaryPopup" style="display: none">
+        <div class="popup-content">
+          <button id="closeSummaryPopup" class="close-btn">×</button>
+          <h2 id="chapSumTitle"></h2>
+          <div id="summaryText" class="summary-scroll"></div>
+          <button id="saveSummary">Save Summary</button>
+        </div>
+      </div>
+        -->
+      <!-- Modal for paraVisualization -->
+      <div class="modal-overlay-2" id="modalOverlay-2">
+        <div class="modal-2">
+          <button class="modal-close-2" onclick="closeImageModal2()">
+            &times;
+          </button>
+          <div class="modal-content-2">
+            <img id="modalImg-2" src="" alt="Generated Image" />
+          </div>
+        </div>
+      </div>
 
       <div class="popup_with_chatbot">
         <div class="characters">
@@ -78,7 +108,7 @@
         </div>
 
         <div id="popup">
-          <button class="popup_buttons">
+          <button class="popup_buttons" id="annotateBtn">
             <img
               src="static/images/annotate.png"
               alt="icon"
@@ -121,6 +151,13 @@
       </div>
 
       <div id="wrapper">
+        <div id="progressWrapper">
+          <div id="progressTrack">
+            <div id="progressFill"></div>
+            <div id="chapterMarkers"></div>
+          </div>
+        </div>
+
         <div id="container">
           <section class="open-book">
             <div class="bookmark-icon" id="displayBookmark">
@@ -132,6 +169,9 @@
               <h6 id="author">Khaled Husseni</h6>
             </header>
             <article>
+              <canvas class="annotation-canvas" id="canvas-left"></canvas>
+              <canvas class="annotation-canvas" id="canvas-right"></canvas>
+
               <div id="bothPages">
                 <div id="book-content-1" class="book-content"></div>
                 <div id="book-content-2" class="book-content"></div>
@@ -192,7 +232,17 @@
             />Visualize Para
           </button>
         </div>
+        <div class="summarize">
+          <button class="popup_button_chatbot" id="summarizeButton">
+            <img
+              src="static/images/summarize.png"
+              alt="icon"
+              class="button_icon_summ"
+            />
+          </button>
+        </div>
       </div>
+
       <div class="overlay" id="overlay"></div>
       <div class="notes_section">
         <div class="sticky-container">
@@ -218,6 +268,7 @@
         </ul>
       </div>
       <div class="chatbot__entry">
+        <button class="chatbot__record" id="record_send">Voice</button>
         <input
           class="chatbot__input"
           id="input"
