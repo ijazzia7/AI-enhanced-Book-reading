@@ -357,10 +357,12 @@ def character_vis():
     data = request.get_json() 
     paragraph = data.get("paragraph")
     output_path = para_visualization.get_images(paragraph)
-    #time.sleep(7) 
-    #output = f'{char} Dummy Output character description For character'
+    #time.sleep(5) 
+    #output = f'Dummy Output character description For character'
     
     return jsonify({"output_path": output_path})  
+    #return jsonify({"output_path": output})  
+
 
 #------------------------------------------------------------------------------------------------
 
@@ -371,6 +373,8 @@ def summarizingChapter():
     chap_num = request.get_json() 
     chapter_content = chapters[chap_num]
     result = summary.summarize(chapter_content)
+    #result = 'sfdsdfdsf fsddfsfds fsdfsddfs'
+    #time.sleep(5)
     return jsonify({"summarized_chapter": result})  
 
 #------------------------------------------------------------------------------------------------

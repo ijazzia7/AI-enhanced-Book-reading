@@ -359,6 +359,7 @@ function updateTooltipMeaning(word, newMeaning, useRed) {
   function handlePopupAction(url, payload, resultTitle) {
     st = selectedText;
     if (!st) return;
+    showSpinner();
     fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -382,6 +383,7 @@ function updateTooltipMeaning(word, newMeaning, useRed) {
         updateTooltipMeaning(st, highlightedWordsBlue[st.toLowerCase()], false);
       })
       .catch((error) => console.error("Popup Action Error:", error));
+      hideSpinner();
       selectedText="";
   }
 
@@ -1047,6 +1049,7 @@ async function updateCharacterDescription(currentDesc, char, p1, p2) {
 
 // UPDATE CHARACTERS IMAGES FUNCTION
 async function updateCharacterImages(char, p1, p2) {
+  showSpinner()
   try {
       const response = await fetch('/visCharacter', {
           method: 'POST',
@@ -1061,12 +1064,20 @@ async function updateCharacterImages(char, p1, p2) {
       });
 
       const data = await response.json();
+      hideSpinner()
       return data.output_path;
   } catch (error) {
       console.error('Error updating character Images:', error);
   }
 }
 
+function showSpinner() {
+  document.getElementById('loading-spinner').classList.remove('hidden');
+}
+
+function hideSpinner() {
+  document.getElementById('loading-spinner').classList.add('hidden');
+}
 
 const modalOverlay2 = document.getElementById("modalOverlay-2");
 const modalImage2 = document.getElementById("modalImg-2");
@@ -1074,6 +1085,7 @@ const modalImage2 = document.getElementById("modalImg-2");
 async function sendParagraphAndShowImage() {
   const paragraph = selectedText;
   console.log(paragraph);
+  showSpinner();
 
   try {
     const response = await fetch('/visParagraph', {
@@ -1086,6 +1098,7 @@ async function sendParagraphAndShowImage() {
     modalImage2.src = data.output_path;
     modalOverlay2.classList.add("active");
     document.body.style.overflow = "hidden";
+    hideSpinner();
   } catch (error) {
     console.error('Error fetching image:', error);
   }
@@ -1451,6 +1464,7 @@ function summarizeFunction() {
 
   if (current_chapter==null) return;
   console.log('sssdssdewes')
+  showSpinner();
   fetch('/summarize', {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -1458,6 +1472,7 @@ function summarizeFunction() {
   })
     .then((response) => response.json())
     .then((data) => {
+      hideSpinner();
       const generated_summary = data.summarized_chapter;
       console.log(generated_summary);
       document.getElementById("summaryText").innerText = generated_summary;
@@ -1499,3 +1514,5 @@ function summarizeFunction() {
 // // Call once initially
 // renderChapterDots();
 // updateProgress(currentPage);
+
+

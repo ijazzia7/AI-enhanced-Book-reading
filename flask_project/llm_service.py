@@ -36,7 +36,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
 
 headers = {
-	"x-rapidapi-key": "d1b14716a1msh36676819b882c70p19de0ejsnab7397c0e9b5",
+	"x-rapidapi-key": "1bf02a2893mshdf19511f9f91ec7p1d360fjsn6c1314c7778b",
 	"x-rapidapi-host": "gpt-4o-mini.p.rapidapi.com",
 	"Content-Type": "application/json"
 }
@@ -439,8 +439,12 @@ class LLMService:
 class Text2SpeechService:
     def __init__(self):
         #Initialize the text-to-speech pipeline and load speaker embeddings
-        device = "mps" if torch.backends.mps.is_available() else "cpu"
-        self.synthesiser = pipeline("text-to-speech", "microsoft/speecht5_tts")
+        #device = "mps" if torch.backends.mps.is_available() else "cpu"
+        #device =  "cpu"
+        self.device = "cpu"
+        self.device_index = -1
+        
+        self.synthesiser = pipeline("text-to-speech", "microsoft/speecht5_tts",device=self.device_index)
         self.embeddings_dataset = load_dataset("Matthijs/cmu-arctic-xvectors", split="validation")
         self.speaker_embedding = torch.tensor(self.embeddings_dataset[7306]["xvector"]).unsqueeze(0)
         f='p'

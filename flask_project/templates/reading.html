@@ -68,7 +68,11 @@
           </div>
         </div>
       </div>
-      <!-- Summary Popup 
+
+      <div id="loading-spinner" class="spinner-overlay hidden">
+        <div class="spinner"></div>
+      </div>
+
       <div id="summaryPopup" style="display: none">
         <div class="popup-content">
           <button id="closeSummaryPopup" class="close-btn">×</button>
@@ -77,7 +81,7 @@
           <button id="saveSummary">Save Summary</button>
         </div>
       </div>
-        -->
+
       <!-- Modal for paraVisualization -->
       <div class="modal-overlay-2" id="modalOverlay-2">
         <div class="modal-2">
@@ -106,46 +110,50 @@
             />
           </button>
         </div>
+        <div class="with_prev_button">
+          <div id="popup">
+            <button class="popup_buttons" id="annotateBtn">
+              <img
+                src="static/images/annotate.png"
+                alt="icon"
+                class="button_icon"
+              />Annotate
+            </button>
+            <button class="popup_buttons">
+              <img
+                src="static/images/highlight.png"
+                alt="icon"
+                class="button_icon"
+                id="highlight-button"
+              />Highlight
+            </button>
 
-        <div id="popup">
-          <button class="popup_buttons" id="annotateBtn">
-            <img
-              src="static/images/annotate.png"
-              alt="icon"
-              class="button_icon"
-            />Annotate
-          </button>
-          <button class="popup_buttons">
-            <img
-              src="static/images/highlight.png"
-              alt="icon"
-              class="button_icon"
-              id="highlight-button"
-            />Highlight
-          </button>
-
-          <button class="popup_buttons" id="bookmark-button">
-            <img
-              src="static/images/bookmark.png"
-              alt="icon"
-              class="button_icon"
-            />Place Bookmark
-          </button>
-          <button class="popup_buttons">
-            <img
-              src="static/images/notes.png"
-              alt="icon"
-              class="button_icon"
-              id="addNotesBtn"
-            />Notes
-          </button>
-          <button class="popup_buttons">
-            <img
-              src="static/images/dictionary.png"
-              alt="icon"
-              class="button_icon"
-              id="dictionaryBtn"
-            />Dictionary
+            <button class="popup_buttons" id="bookmark-button">
+              <img
+                src="static/images/bookmark.png"
+                alt="icon"
+                class="button_icon"
+              />Place Bookmark
+            </button>
+            <button class="popup_buttons">
+              <img
+                src="static/images/notes.png"
+                alt="icon"
+                class="button_icon"
+                id="addNotesBtn"
+              />Notes
+            </button>
+            <button class="popup_buttons">
+              <img
+                src="static/images/dictionary.png"
+                alt="icon"
+                class="button_icon"
+                id="dictionaryBtn"
+              />Dictionary
+            </button>
+          </div>
+          <button id="prev-button">
+            <i class="fas fa-arrow-left">Back</i>
           </button>
         </div>
       </div>
@@ -189,49 +197,10 @@
               </div>
             </footer>
           </section>
-
-          <button id="prev-button">Back</button>
-          <button id="next-button">Next</button>
         </div>
       </div>
+
       <div class="popup_with_chatbot">
-        <div id="popup">
-          <button class="popup_buttons" id="simple-meaning">
-            <img
-              src="static/images/meaning.png"
-              alt="icon"
-              class="button_icon"
-            />Meaning
-          </button>
-          <button class="popup_buttons" id="contextual-meaning">
-            <img
-              src="static/images/context.png"
-              alt="icon"
-              class="button_icon"
-            />Contextual Meaning
-          </button>
-          <button class="popup_buttons" id="create-sentence">
-            <img
-              src="static/images/sentence.png"
-              alt="icon"
-              class="button_icon"
-            />Create Sentence
-          </button>
-          <button class="popup_buttons" id="generate-audio">
-            <img
-              src="static/images/speak.png"
-              alt="icon"
-              class="button_icon"
-            />Speak
-          </button>
-          <button class="popup_buttons" id="vis-para">
-            <img
-              src="static/images/visualize.png"
-              alt="icon"
-              class="button_icon"
-            />Visualize Para
-          </button>
-        </div>
         <div class="summarize">
           <button class="popup_button_chatbot" id="summarizeButton">
             <img
@@ -239,6 +208,48 @@
               alt="icon"
               class="button_icon_summ"
             />
+          </button>
+        </div>
+        <div class="with_prev_button">
+          <div id="popup">
+            <button class="popup_buttons" id="simple-meaning">
+              <img
+                src="static/images/meaning.png"
+                alt="icon"
+                class="button_icon"
+              />Meaning
+            </button>
+            <button class="popup_buttons" id="contextual-meaning">
+              <img
+                src="static/images/context.png"
+                alt="icon"
+                class="button_icon"
+              />Contextual Meaning
+            </button>
+            <button class="popup_buttons" id="create-sentence">
+              <img
+                src="static/images/sentence.png"
+                alt="icon"
+                class="button_icon"
+              />Create Sentence
+            </button>
+            <button class="popup_buttons" id="generate-audio">
+              <img
+                src="static/images/speak.png"
+                alt="icon"
+                class="button_icon"
+              />Speak
+            </button>
+            <button class="popup_buttons" id="vis-para">
+              <img
+                src="static/images/visualize.png"
+                alt="icon"
+                class="button_icon"
+              />Visualize Para
+            </button>
+          </div>
+          <button id="next-button">
+            <i class="fas fa-arrow-right">Next</i>
           </button>
         </div>
       </div>

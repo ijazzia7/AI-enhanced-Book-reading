@@ -1,31 +1,31 @@
 const books = [
   {
-    title: "Book 1",
-    author: "Author 1",
+    title: "The Kite Runner",
+    author: "Khaled Husseni",
     imgPath: "static/images/thekiterunner.jpg",
     link: "./book-link",
-    category: "finance",
+    category: "fiction",
   },
   {
-    title: "Book 2",
-    author: "Author 2",
+    title: "Crime and Punishment",
+    author: "Fyodor Dostoevsky",
     imgPath: "static/images/crimeandpunishment.jpg",
     link: "./book-link",
-    category: "finance",
+    category: "fiction",
   },
   {
-    title: "Book 3",
-    author: "Author 3",
+    title: "The Prophet",
+    author: "Khalil Gibran",
     imgPath: "static/images/theprophet.jpg",
     link: "./book-link",
-    category: "business",
+    category: "fiction",
   },
   {
-    title: "Book 4",
-    author: "Author 4",
+    title: "To Kill a Mockingbird",
+    author: "Harper Lee",
     imgPath: "static/images/mockingbird.png",
     link: "./book-link",
-    category: "business",
+    category: "fiction",
   },
 ];
 
