@@ -1049,7 +1049,6 @@ async function updateCharacterDescription(currentDesc, char, p1, p2) {
 
 // UPDATE CHARACTERS IMAGES FUNCTION
 async function updateCharacterImages(char, p1, p2) {
-  showSpinner()
   try {
       const response = await fetch('/visCharacter', {
           method: 'POST',
@@ -1064,7 +1063,6 @@ async function updateCharacterImages(char, p1, p2) {
       });
 
       const data = await response.json();
-      hideSpinner()
       return data.output_path;
   } catch (error) {
       console.error('Error updating character Images:', error);

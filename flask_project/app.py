@@ -167,7 +167,7 @@ def reading_page():
     
     #return render_template('reading.html')
     return render_template('reading.html', totalPages=len(book_pages), chapterStarts=chapter_pages)
-
+ 
 
 def characters_to_display(characters_dict):
     l = list(characters_dict.values())
@@ -182,8 +182,8 @@ def characters_to_display(characters_dict):
     return keys[values>=2][:10]
 
 
-
-
+ 
+ 
 #------------------------------------------------------------------------------------------------
 @app.route('/simple_meaning', methods=['POST'])  
 def simple_meaning():
