@@ -36,15 +36,15 @@ from langchain.embeddings import HuggingFaceEmbeddings
 url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
 
 headers = {
-	"x-rapidapi-key": "1bf02a2893mshdf19511f9f91ec7p1d360fjsn6c1314c7778b",
+	"x-rapidapi-key": "",
 	"x-rapidapi-host": "gpt-4o-mini.p.rapidapi.com",
 	"Content-Type": "application/json"
 }
-os.environ['FAL_KEY'] = 'abd8d5d0-818f-406e-b212-9f45f6396d41:d3935499c524eedd39be799062757a28'
+os.environ['FAL_KEY'] = ''
 
 
 class paraVisualization:
-    def __init__(self, api_key='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'):
+    def __init__(self, api_key=' '):
         url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
         
     
@@ -164,7 +164,7 @@ class paraVisualization:
     
     
 class characterUpdate:
-    def __init__(self, api_key='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'):
+    def __init__(self, api_key=' '):
         url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
     
     def generate_response(self,current_desc, char, p1, p2, vector_db):
@@ -217,7 +217,7 @@ class characterUpdate:
     
     
 class characterVis:
-    def __init__(self, api_key='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'):
+    def __init__(self, api_key=' '):
         self.client = InferenceClient(
         provider="nebius",
         api_key=api_key)
@@ -309,7 +309,7 @@ class characterVis:
     
     
 class audio_to_text:
-    def __init__(self, api_key='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'):
+    def __init__(self, api_key=' '):
         device = "mps" if torch.backends.mps.is_available() else "cpu"
         self.pipe = pipeline(
             "automatic-speech-recognition",
@@ -328,7 +328,7 @@ class audio_to_text:
 
 
 class ChatWithBook:
-    def __init__(self, api_key='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'):
+    def __init__(self, api_key=' '):
         self.client = InferenceClient(api_key=api_key)
      
         
@@ -372,7 +372,7 @@ class ChatWithBook:
 
 
 class LLMService:
-    def __init__(self, api_key='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'):
+    def __init__(self, api_key=' '):
         self.client = InferenceClient(api_key=api_key)
         
 
