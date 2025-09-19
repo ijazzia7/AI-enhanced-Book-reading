@@ -24,7 +24,7 @@ from langchain.prompts import ChatPromptTemplate
 
 
 class Visualization:
-    def __init__(self, api_key='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'):
+    def __init__(self, api_key=' '):
         pass
         
     def get_images(self):
@@ -50,7 +50,7 @@ class Visualization:
 
 
 class Summarization:
-    def __init__(self, api_key='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'):
+    def __init__(self, api_key=' '):
         self.text = 'The narrator explains why he went to visit Hassan and Ali in 1986: he was lonely, as most of his other friends had either died or escaped to Iran or Afghanistan. He had promised your father to care for the house after they left forPakistan, but with his degenerative arthritis he found it difficult to maintain it. So he decided to go to find them in a nearby village. He found them easily enough - they live in a tiny house surrounded by mud houses.'
     
     def summarize(self, text):
@@ -59,7 +59,7 @@ class Summarization:
     
     
 class audio_to_text:
-    def __init__(self, api_key='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'):
+    def __init__(self, api_key=' '):
         device = "mps" if torch.backends.mps.is_available() else "cpu"
         self.pipe = pipeline(
             "automatic-speech-recognition",
@@ -78,7 +78,7 @@ class audio_to_text:
 
 
 class ChatWithBook:
-    def __init__(self, api_key='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'):
+    def __init__(self, api_key=' '):
         self.client = InferenceClient(api_key=api_key)
         #hf_embeddings = HuggingFaceEndpointEmbeddings(
         #repo_id="sentence-transformers/all-MiniLM-L6-v2",  
@@ -216,7 +216,7 @@ class ChatWithBook:
 
 
 class LLMService:
-    def __init__(self, api_key='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'):
+    def __init__(self, api_key=' '):
         self.client = InferenceClient(api_key=api_key)
         prompt = ''
         self.all_messages = [[
