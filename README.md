@@ -4,7 +4,11 @@
 ### Overview:
 This document outlines the milestones and key deliverables for the next seven months of the project. Each month’s goal is broken into weekly tasks to ensure timely progress.
 
-<img src="flask_project/static/ProductImages/1.png" width="300"/>
+<img src="flask_project/static/ProductImages/1.png" width="500"/>
+<img src="flask_project/static/ProductImages/2.png" width="500"/>
+<img src="flask_project/static/ProductImages/3.png" width="500"/>
+<img src="flask_project/static/ProductImages/4.png" width="500"/>
+
 
 
 ## Month 1: Research and Ideation
