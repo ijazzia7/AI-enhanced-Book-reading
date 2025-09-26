@@ -4,6 +4,9 @@
 ### Overview:
 This document outlines the milestones and key deliverables for the next seven months of the project. Each month’s goal is broken into weekly tasks to ensure timely progress.
 
+<img src="flask_project/static/ProductImages/1.png" width="300"/>
+
+
 ## Month 1: Research and Ideation
 Goal: Conduct literature review, and finalize project scope.
 ### Week 1-2:Project Selection & Proposal Submission
