@@ -36,6 +36,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
 
 headers = {
+<<<<<<< HEAD
 	"x-rapidapi-key": "<>",
 	"x-rapidapi-host": "gpt-4o-mini.p.rapidapi.com",
 	"Content-Type": "application/json"
@@ -45,6 +46,17 @@ os.environ['FAL_KEY'] = '<>'
 
 class paraVisualization:
     def __init__(self, api_key='<>'):
+=======
+	"x-rapidapi-key": "",
+	"x-rapidapi-host": "gpt-4o-mini.p.rapidapi.com",
+	"Content-Type": "application/json"
+}
+os.environ['FAL_KEY'] = ''
+
+
+class paraVisualization:
+    def __init__(self, api_key=' '):
+>>>>>>> 29edee9e701f778ff2e4cf0f650fd2573c8202dc
         url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
         
     
@@ -164,7 +176,11 @@ class paraVisualization:
     
     
 class characterUpdate:
+<<<<<<< HEAD
     def __init__(self, api_key='<>'):
+=======
+    def __init__(self, api_key=' '):
+>>>>>>> 29edee9e701f778ff2e4cf0f650fd2573c8202dc
         url = "https://gpt-4o-mini.p.rapidapi.com/chat/completions"
     
     def generate_response(self,current_desc, char, p1, p2, vector_db):
@@ -217,7 +233,11 @@ class characterUpdate:
     
     
 class characterVis:
+<<<<<<< HEAD
     def __init__(self, api_key='<>'):
+=======
+    def __init__(self, api_key=' '):
+>>>>>>> 29edee9e701f778ff2e4cf0f650fd2573c8202dc
         self.client = InferenceClient(
         provider="nebius",
         api_key=api_key)
@@ -309,7 +329,11 @@ class characterVis:
     
     
 class audio_to_text:
+<<<<<<< HEAD
     def __init__(self, api_key='<>'):
+=======
+    def __init__(self, api_key=' '):
+>>>>>>> 29edee9e701f778ff2e4cf0f650fd2573c8202dc
         device = "mps" if torch.backends.mps.is_available() else "cpu"
         self.pipe = pipeline(
             "automatic-speech-recognition",
@@ -328,7 +352,11 @@ class audio_to_text:
 
 
 class ChatWithBook:
+<<<<<<< HEAD
     def __init__(self, api_key='<>'):
+=======
+    def __init__(self, api_key=' '):
+>>>>>>> 29edee9e701f778ff2e4cf0f650fd2573c8202dc
         self.client = InferenceClient(api_key=api_key)
      
         
@@ -372,7 +400,11 @@ class ChatWithBook:
 
 
 class LLMService:
+<<<<<<< HEAD
     def __init__(self, api_key='<>'):
+=======
+    def __init__(self, api_key=' '):
+>>>>>>> 29edee9e701f778ff2e4cf0f650fd2573c8202dc
         self.client = InferenceClient(api_key=api_key)
         
 

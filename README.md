@@ -1,4 +1,4 @@
-# Final-Year-Project (Milestone Plan)
+# Project (Milestone Plan)
 ## Project Title: AI-Enhanced Book reading powered by Vision and Language models
 
 ### Overview:
